@@ -1,4 +1,5 @@
-name: upload
+name: upload code to kaggle
+run-name: ${{ github.actor }} is uploading code to kaggle
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -29,7 +30,7 @@ jobs:
 
         with:
           id:  ${{ secrets.KAGGLE_USERNAME }}/kaggle--feedback-prize-ell
-          title: "Code for 'Feedback Prize - English Language Learning'"
+          title: "Code for Feedback Prize - English Language Learning"
           subtitle: "Synced using Github actions"
           description: "## We generate features with Deberta V3 models using a sklearn transformer"
           files: |
