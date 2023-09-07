@@ -1,4 +1,16 @@
-# [Feedback Prize - English Language Learning](https://www.kaggle.com/competitions/feedback-prize-english-language-learning/overview): My first(-ish) Kaggle competition
+
+2023-09-07   
+1. fork then bug fix [the github action](https://github.com/Nov05/action-push-kaggle-dataset)   
+2. update the kaggle python api version, from 1.5.12 to 1.5.16  
+
+The content below is from the original author
+
+<br><br>  
+
+---
+
+# [Feedback Prize - English Language Learning](https://www.kaggle.com/competitions/feedback-prize-english-language-learning/overview)   
+*My first(-ish) Kaggle competition*
 
 I'm new to Kaggle and wanted to take this challenge as an opportunity to:
 
