@@ -29,8 +29,8 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
 
         with:
+          ## Default is "{KAGGLE_USERNAME}/{GITHUB_REPO_NAME}" Where KAGGLE_USERNAME is a secret
           # id:  ${{ secrets.KAGGLE_USERNAME }}/kaggle--feedback-prize-ell
-          id:  ${{ secrets.KAGGLE_USERNAME }}/test
           title: "Code for Feedback Prize - English Language Learning"
           subtitle: "Synced using Github actions"
           description: "## We generate features with Deberta V3 models using a sklearn transformer"
@@ -41,4 +41,4 @@ jobs:
             trainers
             .gitignore
             .gitattributes
-          is_public: True
+          is_public: true
