@@ -1,7 +1,8 @@
 
 2023-09-07   
 1. forked then bug-fixed [the github action](https://github.com/Nov05/action-push-kaggle-dataset)   
-2. updated the kaggle python api version, from 1.5.12 to 1.5.16  
+2. updated the kaggle python api version in the action, from 1.5.12 to 1.5.16  
+3. the upload workflow will only be triggered if string "upload to kaggle" is found on the commit message (main.yml)  
 
 <br><br>
 
