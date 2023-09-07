@@ -1,11 +1,11 @@
 
 2023-09-07   
-1. fork then bug fix [the github action](https://github.com/Nov05/action-push-kaggle-dataset)   
-2. update the kaggle python api version, from 1.5.12 to 1.5.16  
+1. forked then bug-fixed [the github action](https://github.com/Nov05/action-push-kaggle-dataset)   
+2. updated the kaggle python api version, from 1.5.12 to 1.5.16  
 
-The content below is from the original author
+<br><br>
 
-<br><br>  
+the content below is from the original author.  
 
 ---
 
