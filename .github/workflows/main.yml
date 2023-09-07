@@ -24,7 +24,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       # Runs a single command using the runners shell
-      - name: upload github code to kaggle
+      - name: Upload github code to kaggle
         # uses: jaimevalero/push-kaggle-dataset@v3 # This is the action
         uses: Nov05/action-push-kaggle-dataset@v1
         env:
