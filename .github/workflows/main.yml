@@ -37,7 +37,7 @@ jobs:
           files: |
             *.py
             *.md
-            *.yml
+            *.yml 
             trainers
             .gitignore
             .gitattributes
