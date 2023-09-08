@@ -1,15 +1,15 @@
 import os
-# comment test
 from abc import ABC, abstractmethod
+
 import numpy as np
 import pandas as pd
-
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-
+from torch_utils import Data
 from torch.utils.data import DataLoader
+from pipelines import make_features_pipeline
 
-# project specific imports
+## local imports
 from config import (
 	FASTTEXT_MODEL_PATH,
 	MSFTDeBertaV3Config,
@@ -18,12 +18,10 @@ from config import (
 	CHALLENGE_NAME,
 	SUBMISSION_DIR
 )
-from torch_utils import Data
-from pipelines import make_features_pipeline
 
-
-SCORE_COLUMNS = ("cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions")
-FEATURE_COLUMNS = ("full_text",)
+## constants
+TARGET_COLUMNS = ("cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions")
+FEATURE_COLUMNS = ("full_text")
 
 
 class ModelTrainer(ABC):
@@ -31,7 +29,7 @@ class ModelTrainer(ABC):
 			self,
 			fastext_model_path,
 			deberta_config: MSFTDeBertaV3Config,
-			target_columns=SCORE_COLUMNS,
+			target_columns=TARGET_COLUMNS,
 			feature_columns=FEATURE_COLUMNS,
 			train_file_name=None,
 			test_file_name=None,
@@ -40,9 +38,12 @@ class ModelTrainer(ABC):
 		self._fastext_model_path = fastext_model_path
 		self._deberta_config = deberta_config
 		self._challenge_name = CHALLENGE_NAME
-		self._train_filename = train_file_name if train_file_name else os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
-		self._test_filename = test_file_name if test_file_name else os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
-		self._submission_filename = submission_filename if submission_filename else os.path.join(KAGGLE_ROOT_DIR, SUBMISSION_DIR, "submission.csv")
+		self._train_filename = train_file_name if train_file_name else \
+			os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
+		self._test_filename = test_file_name if test_file_name else \
+			os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
+		self._submission_filename = submission_filename if submission_filename else \
+			os.path.join(KAGGLE_ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 		self._target_columns = list(target_columns)
 		self._feature_columns = list(feature_columns)
 		self._model = None
@@ -68,17 +69,8 @@ class ModelTrainer(ABC):
 
 	@staticmethod
 	def split_data(df_features, y, test_size, random_state=42):
-		(
-			df_features_train,
-			df_features_test,
-			y_train,
-			y_test
-		) = train_test_split(
-			df_features,
-			y,
-			test_size=test_size,
-			random_state=random_state
-		)
+		df_features_train, df_features_test, y_train, y_test \
+			= train_test_split(df_features, y, test_size=test_size, random_state=random_state)
 		return df_features_train, df_features_test, y_train, y_test
 
 	def get_data_loader(X, y, batch_size, shuffle=True):
@@ -94,11 +86,10 @@ class ModelTrainer(ABC):
 	@staticmethod
 	def recast_scores(y_pred):
 		y_pred = np.round(y_pred * 2) / 2
-		y_pred = np.min([y_pred, np.ones(y_pred.shape) * 5.0], axis=0)
-		y_pred = np.max([y_pred, np.ones(y_pred.shape) * 1.0], axis=0)
+		y_pred = np.min([y_pred, 5.0*np.ones(y_pred.shape)], axis=0)
+		y_pred = np.max([y_pred, 1.0*np.ones(y_pred.shape)], axis=0)
 		return y_pred
 
-	@abstractmethod
 	def predict(self, X, recast_scores=True):
 		y_pred = self._model.predict(X)
 		if recast_scores:
@@ -108,7 +99,8 @@ class ModelTrainer(ABC):
 	@staticmethod
 	def evaluate(y_true, y_pred):
 		assert y_true.shape == y_pred.shape
-		return np.mean([mean_squared_error(y_true[:, idx], y_pred[:, idx], squared=False) for idx in range(y_true.shape[1])])
+		return np.mean([mean_squared_error(y_true[:, idx], y_pred[:, idx], squared=False) \
+				for idx in range(y_true.shape[1])])
 
 	def evaluate_per_category(self, y_true, y_pred):
 		eval_dict = dict()

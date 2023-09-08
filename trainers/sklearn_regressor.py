@@ -5,7 +5,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.dummy import DummyRegressor
 from sklearn.linear_model import LinearRegression
 from trainers.base_trainer import (
-	SCORE_COLUMNS,
+	TARGET_COLUMNS,
 	FEATURE_COLUMNS,
 	ModelTrainer
 )
@@ -20,7 +20,7 @@ class SklearnRegressorTrainer(ModelTrainer):
 			model_type,
 			fastext_model_path,
 			deberta_config: MSFTDeBertaV3Config,
-			target_columns=SCORE_COLUMNS,
+			target_columns=TARGET_COLUMNS,
 			feature_columns=FEATURE_COLUMNS,
 			train_file_name=None,
 			test_file_name=None,

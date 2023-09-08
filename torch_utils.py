@@ -15,7 +15,7 @@ class Data(Dataset):
 			_X = X
 		Xt = torch.from_numpy(_X.astype(np.float32))
 		return Xt
-
+	
 	def __init__(self, X, y):
 		self.X = self.csr_to_torch(X)
 		self.y = torch.from_numpy(y.astype(np.float32))
@@ -28,7 +28,7 @@ class Data(Dataset):
 		return self.len
 
 
-class MeanPooling(nn.Module):
+class MeanPooling(nn.Module):  
 	def __init__(self, clamp_min=1e-9):
 		super(MeanPooling, self).__init__()
 		self._clamp_min = clamp_min

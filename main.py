@@ -1,14 +1,12 @@
+from trainers.sklearn_regressor import SklearnRegressorTrainer
+from trainers.pytorch_regressor import NNTrainer
+
+## local imports
 from config import (
 	MSFTDeBertaV3Config,
 	FASTTEXT_MODEL_PATH
 )
-from trainers.sklearn_regressor import SklearnRegressorTrainer
-from trainers.pytorch_regressor import NNTrainer
 
-# KAGGLE_ROOT_DIR = ""
-# INPUT_DIR = "input"
-# CHALLENGE_NAME = "feedback-prize-english-language-learning"
-# SUBMISSION_DIR = "working"
 
 TEST_SIZE = 0.33
 
@@ -38,7 +36,6 @@ TRAINING_PARAMS["xgb"] = dict(
 	skip_drop=0.0,
 	subsample=1.0
 )
-
 
 TRAINING_PARAMS["lgb"] = dict(
 	boosting_type='gbdt',
@@ -79,6 +76,7 @@ TRAINING_PARAMS["nn"] = dict(
 
 
 if __name__ == "__main__":
+
 	deberta_config = MSFTDeBertaV3Config(
 		model_name="microsoft-deberta-v3-base",
 		pooling="mean",
@@ -87,10 +85,10 @@ if __name__ == "__main__":
 		output_device="cpu",
 		inference_batch_size=10
 	)
+
 	# model_trainer = SklearnRegressorTrainer(
 	# 	model_type="xgb",
 	# )
-
 	model_trainer = NNTrainer(
 		fastext_model_path=FASTTEXT_MODEL_PATH,
 		deberta_config=deberta_config,
@@ -105,8 +103,3 @@ if __name__ == "__main__":
 	X_test = model_trainer._pipeline.transform(df_features_test)
 	y_pred = model_trainer.predict(X_test)
 	print(model_trainer.evaluate(y_test, y_pred))
-
-
-
-
-

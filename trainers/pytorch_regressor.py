@@ -3,16 +3,17 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import default_collate
+from torch.utils.data import DataLoader
+from sklearn.model_selection import train_test_split # replace
 
+## local imports
+from torch_utils import Data
+from config import MSFTDeBertaV3Config
 from trainers.base_trainer import (
-	SCORE_COLUMNS,
+	TARGET_COLUMNS,
 	FEATURE_COLUMNS,
 	ModelTrainer
 )
-from config import MSFTDeBertaV3Config
-from torch_utils import Data
-from torch.utils.data import DataLoader
-from sklearn.model_selection import train_test_split # replace
 
 
 class EllActivation(nn.Module):
@@ -29,11 +30,17 @@ class EllActivation(nn.Module):
 
 class SequentialNeuralNetwork(nn.Module):
 	def __init__(self, X, y, hidden_dims=None, n_hidden=3, force_half_points=False):
+		assert hidden_dims is not None or n_hidden is not None, \
+			"either n_hidden or hidden_dims should be non null"
+
 		super(SequentialNeuralNetwork, self).__init__()
-		# parameters
+
+		## parameters
+		self._force_half_points = force_half_points
+		self._model = nn.Sequential()
 		self._input_dim = X.shape[1]
 		self._output_dim = y.shape[1]
-		assert hidden_dims is not None or n_hidden is not None, "either n_hidden or hidden_dims should be non null"
+		
 		if hidden_dims:
 			print("hidden_dims:", hidden_dims)
 			self._hidden_dims = hidden_dims
@@ -46,14 +53,11 @@ class SequentialNeuralNetwork(nn.Module):
 			self._hidden_dims = [
 				int(np.round(self._input_dim ** (self._alpha ** i))) for i in np.arange(1, self._n_hidden + 1)]
 
-		self._force_half_points = force_half_points
-		self._model = nn.Sequential()
 		if self._n_hidden > 0:
 			for dim_in, dim_out in zip([self._input_dim] + self._hidden_dims, self._hidden_dims):
 				linear_layer = nn.Linear(dim_in, dim_out, bias=True)
-				#                 nn.init.xavier_uniform(linear_layer.weight)
+				#               nn.init.xavier_uniform(linear_layer.weight)
 				self._model.append(linear_layer)
-
 				self._model.append(nn.ReLU())
 			self._model.append(nn.Linear(self._hidden_dims[-1], self._output_dim, bias=True))
 			self._model.append(EllActivation(force_half_points=self._force_half_points))
@@ -71,7 +75,7 @@ class NNTrainer(ModelTrainer):
 			self,
 			fastext_model_path,
 			deberta_config: MSFTDeBertaV3Config,
-			target_columns=SCORE_COLUMNS,
+			target_columns=TARGET_COLUMNS,
 			feature_columns=FEATURE_COLUMNS,
 			train_file_name=None,
 			test_file_name=None,
