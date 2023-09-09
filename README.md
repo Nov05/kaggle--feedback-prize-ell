@@ -6,7 +6,7 @@
 
 <br><br>
 
-the content below is from the original author.  
+the content below is from [the original author](https://github.com/josarago/kaggle--feedback-prize-ell).  
 
 ---
 

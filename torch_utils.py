@@ -3,7 +3,7 @@ from scipy.sparse import csr_matrix
 
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, random_split
+from torch.utils.data import Dataset 
 
 
 class Data(Dataset):

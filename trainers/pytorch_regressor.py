@@ -9,11 +9,9 @@ from sklearn.model_selection import train_test_split # replace
 ## local imports
 from torch_utils import Data
 from config import MSFTDeBertaV3Config
-from trainers.base_trainer import (
-	TARGET_COLUMNS,
-	FEATURE_COLUMNS,
-	ModelTrainer
-)
+from trainers.base_trainer import TARGET_COLUMNS, \
+	                              FEATURE_COLUMNS, \
+	                              ModelTrainer
 
 
 class EllActivation(nn.Module):
@@ -31,7 +29,7 @@ class EllActivation(nn.Module):
 class SequentialNeuralNetwork(nn.Module):
 	def __init__(self, X, y, hidden_dims=None, n_hidden=3, force_half_points=False):
 		assert hidden_dims is not None or n_hidden is not None, \
-			"either n_hidden or hidden_dims should be non null"
+			"Either n_hidden or hidden_dims should be non null."
 
 		super(SequentialNeuralNetwork, self).__init__()
 
@@ -46,7 +44,7 @@ class SequentialNeuralNetwork(nn.Module):
 			self._hidden_dims = hidden_dims
 			self._n_hidden = len(self._hidden_dims)
 
-		if n_hidden is not None:
+		if n_hidden:
 			print("n_hidden:", n_hidden)
 			self._n_hidden = n_hidden
 			self._alpha = (np.log(self._output_dim) / np.log(self._input_dim)) ** (1 / (self._n_hidden + 1))
@@ -55,8 +53,8 @@ class SequentialNeuralNetwork(nn.Module):
 
 		if self._n_hidden > 0:
 			for dim_in, dim_out in zip([self._input_dim] + self._hidden_dims, self._hidden_dims):
+				# linear_layer = nn.init.xavier_uniform(linear_layer.weight)
 				linear_layer = nn.Linear(dim_in, dim_out, bias=True)
-				#               nn.init.xavier_uniform(linear_layer.weight)
 				self._model.append(linear_layer)
 				self._model.append(nn.ReLU())
 			self._model.append(nn.Linear(self._hidden_dims[-1], self._output_dim, bias=True))
@@ -70,57 +68,53 @@ class SequentialNeuralNetwork(nn.Module):
 		return self._model(x)
 
 
+##############################################################
+## using such models: naive neural network + fasttext embedding
+##############################################################
 class NNTrainer(ModelTrainer):
-	def __init__(
-			self,
-			fastext_model_path,
-			deberta_config: MSFTDeBertaV3Config,
-			target_columns=TARGET_COLUMNS,
-			feature_columns=FEATURE_COLUMNS,
-			train_file_name=None,
-			test_file_name=None,
-			submission_filename=None,
-	):
-		super().__init__(
-			fastext_model_path,
-			deberta_config,
-			target_columns=target_columns,
-			feature_columns=feature_columns,
-			train_file_name=train_file_name,
-			test_file_name=test_file_name,
-			submission_filename=submission_filename,
-		)
-		# pytorch specific
+	def __init__(self,
+				 fastext_model_path,
+			     deberta_config:MSFTDeBertaV3Config,
+				 target_columns=TARGET_COLUMNS,
+				 feature_columns=FEATURE_COLUMNS,
+				 train_file_name=None,
+				 test_file_name=None,
+				 submission_filename = None):
+		super().__init__(fastext_model_path,
+						 deberta_config,
+						 target_columns=target_columns,
+						 feature_columns=feature_columns,
+						 train_file_name=train_file_name,
+						 test_file_name=test_file_name,
+						 submission_filename=submission_filename)
+		## pytorch specific
 		self._optimizer = None
 		self._loss_fn = nn.MSELoss()
 		self._loss_values = dict()
-		self._training_device = self._deberta_config.inference_device
+		self._training_device = self._deberta_config.training_device
+		self._inference_device = self._deberta_config.inference_device
+
 
 	def get_data_loader(self, X, y, bactch_size, shuffle=True):
 		data = Data(X, y)
-		data_loader = DataLoader(
-			dataset=data,
-			batch_size=bactch_size,
-			shuffle=shuffle,
-			collate_fn=lambda x: tuple(x_.to(self._training_device) for x_ in default_collate(x))
+		data_loader = DataLoader(dataset=data,
+							 	 batch_size=bactch_size,
+								 shuffle=shuffle,
+								 collate_fn=lambda x: tuple(x_.to(self._training_device) for x_ in default_collate(x))
 		)
 		return data_loader
 
+
 	def train(self, X, y, params):
-		self._model = SequentialNeuralNetwork(
-			X,
-			y,
-			hidden_dims=params["hidden_dims"],
-			n_hidden=params["n_hidden"],
-			force_half_points=params["force_half_points"]
-		)
+		## instantiate the model
+		self._model = SequentialNeuralNetwork(X, y,
+											  hidden_dims=params["hidden_dims"],
+											  n_hidden=params["n_hidden"],
+											  force_half_points=params["force_half_points"])
 		self._model.to(self._training_device)
-		self._optimizer = torch.optim.Adam(
-			self._model.parameters(),
-			lr=params["learning_rate"]
-		)
-		self._loss_values = dict()
-		self._loss_values["train"] = []
+		self._optimizer = torch.optim.Adam(self._model.parameters(),
+			                               lr=params["learning_rate"])
+		self._loss_values["train"]=[]
 		if params["with_validation"]:
 			print("Using validation")
 			self._loss_values["val"] = []
@@ -130,34 +124,38 @@ class NNTrainer(ModelTrainer):
 		else:
 			train_data_loader = self.get_data_loader(X, y, params["batch_size"], params["shuffle"])
 
+		## start training
 		for epoch in range(params["num_epochs"]):
-			_loss_values = dict(train=[])
+			epoch_loss_values = dict(train=[])
 
 			for X_train, y_train in train_data_loader:
-				# Compute prediction error
+				## Compute prediction error
 				y_pred_train = self._model(X_train.to(self._training_device))
 				train_loss = self._loss_fn(y_pred_train, y_train.to(self._training_device))
-				_loss_values["train"].append(train_loss.item())
+				epoch_loss_values["train"].append(train_loss.item())
 
-				# Backpropagation
+				## Backpropagation
 				self._optimizer.zero_grad()
 				train_loss.backward()
 				self._optimizer.step()
 
-			self._loss_values["train"].append(np.sqrt(np.mean(_loss_values["train"])))
-			if params["with_validation"]:
-				_loss_values["val"] = []
-				self._model.eval()  # Optional when not using Model Specific layer
-				for X_val, y_val in val_data_loader:
-					# Forward Pass
-					y_pred_val = self._model(X_val)
-					# Find the Loss
-					val_loss = self._loss_fn(y_pred_val, y_val)
-					# Calculate Loss
-					_loss_values["val"].append(val_loss.item())
-			self._loss_values["val"].append(np.sqrt(np.mean(_loss_values["val"])))
+			self._loss_values["train"].append(np.sqrt(np.mean(epoch_loss_values["train"])))
 
-		print("Training Complete")
+			if params["with_validation"]:
+				epoch_loss_values["val"] = []
+				self._model.eval()  # optional when not using Model Specific layer
+				for X_val, y_val in val_data_loader:
+					## forward pass
+					y_pred_val = self._model(X_val)
+					## find loss
+					val_loss = self._loss_fn(y_pred_val, y_val)
+					## calculate loss
+					epoch_loss_values["val"].append(val_loss.item())
+
+				self._loss_values["val"].append(np.sqrt(np.mean(epoch_loss_values["val"])))
+
+		print("Training completed.")
+
 
 	def plot_loss_values(self):
 		fig, ax = plt.subplots(figsize=(20, 5))
@@ -169,8 +167,9 @@ class NNTrainer(ModelTrainer):
 		ax.legend()
 		plt.show()
 
+
 	def predict(self, X, recast_scores=True):
-		y_pred = self._model(Data.csr_to_torch(X).to(self._training_device)).cpu().detach().numpy()
+		y_pred = self._model(Data.csr_to_torch(X).to(self._inference_device)).cpu().detach().numpy()
 		if recast_scores:
 			y_pred = self.recast_scores(y_pred)
 		return y_pred

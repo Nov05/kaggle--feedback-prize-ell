@@ -1,18 +1,15 @@
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
-
 import fasttext
-
 import torch
 from torch_utils import MeanPooling
 from torch.utils.data import DataLoader
-
 from transformers import AutoTokenizer, AutoModel
+from tqdm import tqdm
 
+## local imports
 from config import MSFTDeBertaV3Config
 from english_utils import clean_special_characters
 
@@ -21,10 +18,8 @@ def ft_langdetect(text: str, fasttext_model):
 	labels, scores = fasttext_model.predict(text)
 	label = labels[0].replace("__label__", '')
 	score = min(float(scores[0]), 1.0)
-	return {
-		"lang": label,
-		"score": score,
-	}
+	return {"lang": label,
+		    "score": score}
 
 
 def ftlangdetect_english_score(series: pd.Series, fasttext_model) -> np.array:
@@ -34,10 +29,8 @@ def ftlangdetect_english_score(series: pd.Series, fasttext_model) -> np.array:
 
 
 class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
-	def __init__(
-			self,
-			model_path
-	):
+	def __init__(self,
+			     model_path):
 		"""
 			This transformer outputs the predictions
 			from a pretrained fasttext langdetect model
@@ -45,8 +38,10 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 		self._model_path = model_path
 		self._model = fasttext.load_model(self._model_path)
 
+
 	def __repr__(self):
 		return f"FTLangdetectTransformer from path '{self._model_path}'"
+
 
 	def ft_langdetect(self, text: str):
 		labels, scores = self._model.predict(text)
@@ -57,8 +52,10 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 			"score": score,
 		}
 
+
 	def fit(self, X, y=None):
 		return self
+
 
 	def transform(self, series: pd.Series) -> np.array:
 		check_is_fitted(self, ['_model'])
@@ -68,14 +65,16 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 
 class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	def __init__(self, config):
-		self.config: MSFTDeBertaV3Config = config
+		self.config:MSFTDeBertaV3Config = config
 		self.tokenizer = AutoTokenizer.from_pretrained(self.config.tokenizer)
 		self.model = AutoModel.from_pretrained(self.config.model).to(
 			self.config.inference_device
 		)
 
+
 	def fit(self, series, y=None):
 		return self
+
 
 	def prepare_input(self, input_texts):
 		"""
@@ -98,6 +97,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 			inputs[k] = torch.tensor(v, dtype=torch.long)
 		return inputs
 
+
 	@torch.no_grad()
 	def feature(self, inputs):
 		self.model.eval()
@@ -110,6 +110,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 			inputs['attention_mask'].to(self.config.inference_device)
 		)
 		return feature
+
 
 	def batch_transform(self, series):
 		y_preds_list = []
@@ -128,10 +129,12 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 		y_preds = np.concatenate(y_preds_list)
 		return y_preds
 
+
 	def simple_transform(self, series):
 		inputs = self.prepare_input(series).to(self.config.inference_device)
 		y_preds = self.feature(inputs).to(self.config.output_device)
 		return y_preds
+
 
 	def transform(self, series):
 		# check_is_fitted(self, ['model', 'tokenizer'])
@@ -141,6 +144,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 		else:
 			print("using simple_transform")
 			return self.simple_transform(series)
+
 
 	def fit_transform(self, series, y=None):
 		self.fit(series, y=None)

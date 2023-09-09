@@ -2,7 +2,8 @@ import os
 import torch
 import platform
 
-KAGGLE_ROOT_DIR = "." if "arm64" in platform.platform() else "/kaggle"
+PLATFORM_ARM64 = 'arm64'
+KAGGLE_ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() else "/kaggle"
 INPUT_DIR = "input"
 CHALLENGE_NAME = "feedback-prize-english-language-learning"
 SUBMISSION_DIR = "working"
@@ -11,40 +12,38 @@ FASTTEXT_MODEL_PATH = os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, "fasttextmodel/li
 MODELS_DIR_PATH = os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, "fb3models")
 
 
-def get_default_inference_device():
-	if "arm" in platform.platform():
+def get_default_device():
+	if PLATFORM_ARM64 in platform.platform():
 		return "mps:0"
-	else:
-		if torch.cuda.is_available():
-			return "cuda:0"
+	elif torch.cuda.is_available():
+		return "cuda:0"
 	return "cpu"
 
 
 class MSFTDeBertaV3Config:
-	def __init__(
-			self,
-			model_name,
-			pooling,
-			inference_device=None,
-			batch_inference=True,
-			output_device="cpu",
-			inference_batch_size=100,
-	):
+	def __init__(self,
+			     model_name,
+			     pooling="mean",
+			     training_device=None,
+				 inference_device=None,
+			     batch_inference=True,
+			     inference_batch_size=100):
 		"""
-			used to manage the deberta model configuration
+		manage the deberta model configuration
 		"""
-		assert pooling == "mean", "we removed all other implementations other than 'mean'."
+		assert pooling=="mean", "We removed all other implementations other than 'mean'."
 
 		self._model_name = model_name
 		self.pooling = pooling
+		self.training_device = training_device if training_device \
+			                   else get_default_device()
 		self.inference_device = inference_device if inference_device \
-			else get_default_inference_device()
+		                        else get_default_device()
 		self._batch_inference = batch_inference
 		self._inference_batch_size = inference_batch_size
 		self._models_dir_path = MODELS_DIR_PATH
 		self._model_path = os.path.join(self._models_dir_path, self._model_name)
 		self.gradient_checkpointing = False
-		self.output_device = output_device
 		self.tokenizer_max_length = 512
 
 	@property
@@ -59,6 +58,9 @@ class MSFTDeBertaV3Config:
 	def tokenizer(self):
 		return os.path.join(self._model_path, "tokenizer")
 
+
 	def __repr__(self):
-		return f"MSFTDeBertaV3Config config object with: model_size: \
-			'{self._model_size}' and inference device: '{self.inference_device}'"
+		return f"""MSFTDeBertaV3Config object:
+\t model name: {self._model_name}
+\t traning device: {self.training_device}
+\t inference device: {self.inference_device}"""

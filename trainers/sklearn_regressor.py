@@ -1,40 +1,36 @@
 import xgboost as xgb
 import lightgbm as lgb
-
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.dummy import DummyRegressor
 from sklearn.linear_model import LinearRegression
-from trainers.base_trainer import (
-	TARGET_COLUMNS,
-	FEATURE_COLUMNS,
-	ModelTrainer
-)
 
+## local imports
 from config import MSFTDeBertaV3Config
+from trainers.base_trainer import TARGET_COLUMNS, \
+                                  FEATURE_COLUMNS, \
+	                              ModelTrainer
 
-
+##############################################################
+## Using such models: dummy (mean), linear, XGBoost, LightGBM
+##############################################################
 class SklearnRegressorTrainer(ModelTrainer):
 
-	def __init__(
-			self,
-			model_type,
-			fastext_model_path,
-			deberta_config: MSFTDeBertaV3Config,
-			target_columns=TARGET_COLUMNS,
-			feature_columns=FEATURE_COLUMNS,
-			train_file_name=None,
-			test_file_name=None,
-			submission_filename=None,
-	):
-		super().__init__(
-			fastext_model_path,
-			deberta_config,
-			target_columns=target_columns,
-			feature_columns=feature_columns,
-			train_file_name=train_file_name,
-			test_file_name=test_file_name,
-			submission_filename=submission_filename,
-		)
+	def __init__(self,
+		  		 model_type,
+				 fastext_model_path,
+				 deberta_config: MSFTDeBertaV3Config,
+				 target_columns=TARGET_COLUMNS,
+				 feature_columns=FEATURE_COLUMNS,
+				 train_file_name=None,
+				 test_file_name=None,
+				 submission_filename=None):
+		super().__init__(fastext_model_path,
+						 deberta_config,
+						 target_columns=target_columns,
+						 feature_columns=feature_columns,
+						 train_file_name=train_file_name,
+						 test_file_name=test_file_name,
+						 submission_filename=submission_filename)
 		self._model_type = model_type
 
 	def train(self, X, y, params=None):
@@ -59,4 +55,3 @@ class SklearnRegressorTrainer(ModelTrainer):
 		if recast_scores:
 			y_pred = self.recast_scores(y_pred)
 		return y_pred
-

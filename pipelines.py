@@ -3,27 +3,22 @@ import pandas as pd
 
 from sklego.preprocessing import ColumnSelector
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.preprocessing import FunctionTransformer, StandardScaler, QuantileTransformer, Normalizer
-
+from sklearn.preprocessing import FunctionTransformer, StandardScaler, Normalizer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn_transformers import (
-	FTLangdetectTransformer,
-	PooledDeBertaTransformer
-)
 
+## local imports
 from config import FASTTEXT_MODEL_PATH, MSFTDeBertaV3Config
-from english_utils import (
-	number_of_unigrams,
-	number_of_line_breaks,
-	get_punctuation_error_fraction
-)
+from sklearn_transformers import FTLangdetectTransformer, PooledDeBertaTransformer
+from english_utils import number_of_unigrams, number_of_line_breaks, get_punctuation_error_fraction
+
+
+FEATURE_COLUMNS = ["full_text"]
+
 
 def to_series(df: pd.DataFrame) -> pd.Series:
 	assert df.shape[1] == 1
 	return df.iloc[:, 0]
 
-
-FEATURE_COLUMNS = ["full_text"]
 
 feature_column_picker_pipe = Pipeline(
 	steps=[
@@ -98,7 +93,7 @@ def make_english_score_pipe(model_path=FASTTEXT_MODEL_PATH):
 
 def make_deberta_pipe(deberta_config):
 	pooled_deberta_pipe = Pipeline(steps=[
-			# this is upsetting as hell but somehow the only way I can make this pipeline to work
+			## this is upsetting as hell but somehow the only way I can make this pipeline to work
 			("index_resetter", FunctionTransformer(lambda _df: _df.reset_index())),
 			("feature_column_picker", feature_column_picker_pipe),
 			("deberta_embedding", PooledDeBertaTransformer(deberta_config)),
