@@ -1,6 +1,9 @@
 from trainers.sklearn_regressor import SklearnRegressorTrainer
 from trainers.pytorch_regressor import NNTrainer
 
+import warnings
+warnings.filterwarnings("ignore")
+
 ## local imports
 from config import MSFTDeBertaV3Config, \
 	               FASTTEXT_MODEL_PATH
@@ -64,38 +67,56 @@ TRAINING_PARAMS["nn"] = dict(
 	n_hidden=None,
 	batch_size=BATCH_SIZE,
 	force_half_points=False,
-	num_epochs=10,
+	num_epochs=2000,
 	learning_rate=0.0001,
 	shuffle=True,
 	val_size=0.25,
 	with_validation=True,
-	training_device="cpu"
+	training_device=None #"cpu"
 )
 
 
 if __name__ == "__main__":
 
 	deberta_config = MSFTDeBertaV3Config(
-		model_name="microsoft-deberta-v3-base",
-		# pooling="mean", 
-		# training_device="mps",
+		model_name="deberta-v3-base",
+		# pooling="mean", ## "mean" is the only option for now
+		# training_device="mps", ## use default device
 		# inference_device="cpu",		
-		batch_inference=True,
-		inference_batch_size=10
+		batch_transform=True,
+		batch_transform_size=10
 	)
 
-	# model_trainer = SklearnRegressorTrainer(model_type="xgb"
-	# )
-	model_trainer = NNTrainer(fastext_model_path=FASTTEXT_MODEL_PATH,
-		                      deberta_config=deberta_config)
+	model_type = 'nn' ## 'lgb', 'xgb', 'linear", 'dummy', 'nn'
+	if model_type=='nn':
+		model_trainer = NNTrainer(fastext_model_path=FASTTEXT_MODEL_PATH,
+								deberta_config=deberta_config)
+	else:
+		model_trainer = SklearnRegressorTrainer(model_type=model_type,
+												fastext_model_path=FASTTEXT_MODEL_PATH,
+												deberta_config=deberta_config)
 	
-	# df = model_trainer.load_data()
-	# df_features, y = model_trainer.get_training_set(df.iloc[:40])
-	# df_features_train, df_features_test, y_train, y_test = \
-	# 	model_trainer.split_data(df_features, y, test_size=TEST_SIZE)
-	# X_train = model_trainer._pipeline.fit_transform(df_features_train)
-	# model_trainer.train(X_train, y_train, TRAINING_PARAMS["nn"])
+	print("loading training data...")
+	df = model_trainer.load_data() 
+	df_features, y = model_trainer.get_training_set(df) #(df.iloc[:100,:]) ## y is a 6-col numpy.ndarray
+	df_features_train, df_features_test, y_train, y_test = \
+		model_trainer.split_data(df_features, y, test_size=TEST_SIZE) ## types: df, df, np array, np array
 
-	# X_test = model_trainer._pipeline.transform(df_features_test)
-	# y_pred = model_trainer.predict(X_test)
-	# print(model_trainer.evaluate(y_test, y_pred))
+	print("transforming data...")
+	X_train = model_trainer._pipeline.fit_transform(df_features_train)
+
+	print("training...")
+	model_trainer.train(X_train, y_train, TRAINING_PARAMS[model_type])
+
+	print("testing...")
+	X_test = model_trainer._pipeline.transform(df_features_test)
+	y_pred = model_trainer.predict(X_test)
+
+	print("evaluating...")
+	print(model_trainer.evaluate(y_test, y_pred))
+
+	if model_type=='nn':
+		print("ploting losses...")
+		model_trainer.plot_loss_values()
+
+	print("all done")

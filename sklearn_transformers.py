@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
-import fasttext
 import torch
-from torch_utils import MeanPooling
 from torch.utils.data import DataLoader
+from torch_utils import MeanPooling
+import fasttext
 from transformers import AutoTokenizer, AutoModel
 from tqdm import tqdm
 
@@ -47,10 +47,8 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 		labels, scores = self._model.predict(text)
 		label = labels[0].replace("__label__", '')
 		score = min(float(scores[0]), 1.0)
-		return {
-			"lang": label,
-			"score": score,
-		}
+		return {"lang": label,
+			    "score": score}
 
 
 	def fit(self, X, y=None):
@@ -66,10 +64,10 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	def __init__(self, config):
 		self.config:MSFTDeBertaV3Config = config
-		self.tokenizer = AutoTokenizer.from_pretrained(self.config.tokenizer)
-		self.model = AutoModel.from_pretrained(self.config.model).to(
-			self.config.inference_device
-		)
+		# self.tokenizer = AutoTokenizer.from_pretrained(self.config.tokenizer)
+		# self.model = AutoModel.from_pretrained(self.config.model).to(self.config.inference_device)
+		self.tokenizer = AutoTokenizer.from_pretrained(self.config._model_path)
+		self.model = AutoModel.from_pretrained(self.config._model_path).to(self.config.inference_device)
 
 
 	def fit(self, series, y=None):
@@ -93,7 +91,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 			pad_to_max_length=True,
 			truncation=True
 		)
-		for k, v in inputs.items():
+		for k,v in inputs.items():
 			inputs[k] = torch.tensor(v, dtype=torch.long)
 		return inputs
 
@@ -101,48 +99,44 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	@torch.no_grad()
 	def feature(self, inputs):
 		self.model.eval()
-		#         last_hidden_states = self.model(**{k: v.to(self.config._inference_device) for k, v, in inputs.items()})[0]
+		# last_hidden_states = self.model(**{k: v.to(self.config._inference_device) for k, v, in inputs.items()})[0]
 		last_hidden_states = self.model(
-			**{k: v.to(self.config.inference_device) for k, v, in inputs.items()}
+			**{k: v.to(self.config.training_device) for k, v, in inputs.items()}
 		).last_hidden_state
 		feature = MeanPooling()(
 			last_hidden_states,
-			inputs['attention_mask'].to(self.config.inference_device)
+			inputs['attention_mask'].to(self.config.training_device)
 		)
 		return feature
 
 
 	def batch_transform(self, series):
 		y_preds_list = []
-		data_loader = DataLoader(
-			dataset=series,
-			batch_size=self.config._inference_batch_size,
-			shuffle=False
-		)
+		data_loader = DataLoader(dataset=series,
+								 batch_size=self.config._batch_transform_size,
+								 shuffle=False)
 		for _series in tqdm(data_loader):
-			_inputs = self.prepare_input(
-				_series
-			).to(self.config.inference_device)
+			_inputs = self.prepare_input(_series).to(self.config.inference_device)
 			with torch.no_grad():
 				__y_preds = self.feature(_inputs)
-			y_preds_list.append(__y_preds.to(self.config.output_device))
+			y_preds_list.append(__y_preds.cpu())
 		y_preds = np.concatenate(y_preds_list)
 		return y_preds
 
 
 	def simple_transform(self, series):
 		inputs = self.prepare_input(series).to(self.config.inference_device)
-		y_preds = self.feature(inputs).to(self.config.output_device)
+		y_preds = self.feature(inputs).to(self.config.inference_device)
 		return y_preds
 
 
 	def transform(self, series):
 		# check_is_fitted(self, ['model', 'tokenizer'])
-		if self.config._batch_inference:
-			print("using batch_transform")
+		if self.config._batch_transform:
+			print("using batch transform")
 			return self.batch_transform(series)
 		else:
-			print("using simple_transform")
+			print("using simple transform")
 			return self.simple_transform(series)
 
 

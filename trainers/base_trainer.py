@@ -1,6 +1,3 @@
-import os
-from abc import ABC, abstractmethod
-
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -9,50 +6,54 @@ from torch_utils import Data
 from torch.utils.data import DataLoader
 from pipelines import make_features_pipeline
 
+import os
+from abc import ABC, abstractmethod
+
 ## local imports
 from config import FASTTEXT_MODEL_PATH, \
 				   MSFTDeBertaV3Config, \
-				   KAGGLE_ROOT_DIR, \
+				   ROOT_DIR, \
 				   INPUT_DIR, \
 				   CHALLENGE_NAME, \
 				   SUBMISSION_DIR
 
 
 ## constants
-TARGET_COLUMNS = ("cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions")
-FEATURE_COLUMNS = ("full_text")
+FEATURE_COLUMNS = ["full_text"]
+TARGET_COLUMNS = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions"]
 
 
 class ModelTrainer(ABC):
 	def __init__(self,
 			 	 fastext_model_path,
-				 deberta_config: MSFTDeBertaV3Config,
-				 target_columns=TARGET_COLUMNS,
+				 deberta_config:MSFTDeBertaV3Config=None,
 				 feature_columns=FEATURE_COLUMNS,
+				 target_columns=TARGET_COLUMNS,
 				 train_file_name=None,
 				 test_file_name=None,
-				 submission_filename=None):
+				 submission_file_name=None):
 		self._fastext_model_path = fastext_model_path
 		self._deberta_config = deberta_config
+		self._feature_columns = feature_columns
+		self._target_columns = target_columns
 		self._challenge_name = CHALLENGE_NAME
-		self._train_filename = train_file_name if train_file_name else \
-			os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
-		self._test_filename = test_file_name if test_file_name else \
-			os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
-		self._submission_filename = submission_filename if submission_filename else \
-			os.path.join(KAGGLE_ROOT_DIR, SUBMISSION_DIR, "submission.csv")
-		self._target_columns = list(target_columns)
-		self._feature_columns = list(feature_columns)
+		self._train_file_name = train_file_name if train_file_name else \
+			os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
+		self._test_file_name = test_file_name if test_file_name else \
+			os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
+		self._submission_file_name = submission_file_name if submission_file_name else \
+			os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 		self._model = None
 		self._pipeline = make_features_pipeline(fastext_model_path=self._fastext_model_path,
 			                                    deberta_config=self._deberta_config)
+
 
 	def __repr__(self):
 		return "'ModelTrainer' object"
  
 
 	def load_data(self):
-		df = pd.read_csv(self._train_filename)
+		df = pd.read_csv(self._train_file_name)
 		for column in self._target_columns:
 			assert df[column].dtype == float
 		df["partition"] = "train"
@@ -73,7 +74,7 @@ class ModelTrainer(ABC):
 
 
 	def get_data_loader(X, y, batch_size, shuffle=True):
-		# Instantiate training and test data
+		## instantiate training and test data
 		data = Data(X, y)
 		data_loader = DataLoader(dataset=data, batch_size=batch_size, shuffle=shuffle)
 		return data_loader
@@ -101,7 +102,7 @@ class ModelTrainer(ABC):
 
 	@staticmethod
 	def evaluate(y_true, y_pred):
-		assert y_true.shape == y_pred.shape
+		assert y_true.shape==y_pred.shape
 		return np.mean([mean_squared_error(y_true[:, idx], y_pred[:, idx], squared=False) \
 			            for idx in range(y_true.shape[1])])
 
@@ -114,14 +115,14 @@ class ModelTrainer(ABC):
 
 
 	def make_submission_df(self, recast_scores=True, write_file=True):
-		print(f"loading test file from: '{self._test_filename}'")
-		submission_df = pd.read_csv(self._test_filename)
+		print(f"loading test file from: '{self._test_file_name}'")
+		submission_df = pd.read_csv(self._test_file_name)
 		X_submission = self._pipeline.transform(submission_df)
 		y_pred_submission = self.predict(X_submission, recast_scores=recast_scores)
 
 		submission_df[self._target_columns] = y_pred_submission
 		submission_df = submission_df[["text_id"] + self._target_columns]
 		if write_file:
-			print(f"writing submission to: '{self._submission_filename}'")
-			submission_df.to_csv(self._submission_filename, index=False)
+			print(f"writing submission to: '{self._submission_file_name}'")
+			submission_df.to_csv(self._submission_file_name, index=False)
 		return submission_df

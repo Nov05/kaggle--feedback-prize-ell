@@ -39,6 +39,7 @@ class SequentialNeuralNetwork(nn.Module):
 		self._input_dim = X.shape[1]
 		self._output_dim = y.shape[1]
 		
+		print("model info:")
 		if hidden_dims:
 			print("hidden_dims:", hidden_dims)
 			self._hidden_dims = hidden_dims
@@ -69,7 +70,7 @@ class SequentialNeuralNetwork(nn.Module):
 
 
 ##############################################################
-## using such models: naive neural network + fasttext embedding
+## fully connected layer(s)
 ##############################################################
 class NNTrainer(ModelTrainer):
 	def __init__(self,
@@ -79,20 +80,21 @@ class NNTrainer(ModelTrainer):
 				 feature_columns=FEATURE_COLUMNS,
 				 train_file_name=None,
 				 test_file_name=None,
-				 submission_filename = None):
+				 submission_file_name = None):
 		super().__init__(fastext_model_path,
 						 deberta_config,
 						 target_columns=target_columns,
 						 feature_columns=feature_columns,
 						 train_file_name=train_file_name,
 						 test_file_name=test_file_name,
-						 submission_filename=submission_filename)
+						 submission_file_name=submission_file_name)
 		## pytorch specific
 		self._optimizer = None
 		self._loss_fn = nn.MSELoss()
 		self._loss_values = dict()
 		self._training_device = self._deberta_config.training_device
 		self._inference_device = self._deberta_config.inference_device
+		print(f"the troch modal will be trained on {self._training_device}")
 
 
 	def get_data_loader(self, X, y, bactch_size, shuffle=True):
@@ -116,12 +118,13 @@ class NNTrainer(ModelTrainer):
 			                               lr=params["learning_rate"])
 		self._loss_values["train"]=[]
 		if params["with_validation"]:
-			print("Using validation")
+			print("using validation")
 			self._loss_values["val"] = []
 			X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=params["val_size"])
 			train_data_loader = self.get_data_loader(X_train, y_train, params["batch_size"], params["shuffle"])
 			val_data_loader = self.get_data_loader(X_val, y_val, params["batch_size"], params["shuffle"])
 		else:
+			print("no validation")
 			train_data_loader = self.get_data_loader(X, y, params["batch_size"], params["shuffle"])
 
 		## start training
@@ -129,21 +132,20 @@ class NNTrainer(ModelTrainer):
 			epoch_loss_values = dict(train=[])
 
 			for X_train, y_train in train_data_loader:
-				## Compute prediction error
+				## compute prediction error
 				y_pred_train = self._model(X_train.to(self._training_device))
 				train_loss = self._loss_fn(y_pred_train, y_train.to(self._training_device))
 				epoch_loss_values["train"].append(train_loss.item())
 
-				## Backpropagation
+				## backpropagation
 				self._optimizer.zero_grad()
 				train_loss.backward()
 				self._optimizer.step()
-
 			self._loss_values["train"].append(np.sqrt(np.mean(epoch_loss_values["train"])))
 
 			if params["with_validation"]:
 				epoch_loss_values["val"] = []
-				self._model.eval()  # optional when not using Model Specific layer
+				self._model.eval()  ## optional when not using Model Specific layer
 				for X_val, y_val in val_data_loader:
 					## forward pass
 					y_pred_val = self._model(X_val)
@@ -151,10 +153,9 @@ class NNTrainer(ModelTrainer):
 					val_loss = self._loss_fn(y_pred_val, y_val)
 					## calculate loss
 					epoch_loss_values["val"].append(val_loss.item())
-
 				self._loss_values["val"].append(np.sqrt(np.mean(epoch_loss_values["val"])))
 
-		print("Training completed.")
+		print("training completed")
 
 
 	def plot_loss_values(self):

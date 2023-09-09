@@ -2,14 +2,18 @@ import os
 import torch
 import platform
 
-PLATFORM_ARM64 = 'arm64'
-KAGGLE_ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() else "/kaggle"
-INPUT_DIR = "input"
-CHALLENGE_NAME = "feedback-prize-english-language-learning"
-SUBMISSION_DIR = "working"
 
-FASTTEXT_MODEL_PATH = os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, "fasttextmodel/lid.176.ftz")
-MODELS_DIR_PATH = os.path.join(KAGGLE_ROOT_DIR, INPUT_DIR, "fb3models")
+PLATFORM_ARM64 = 'arm64' ## mac etc.
+PLATFORM_WIN = 'Win' ## Windows
+ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() or PLATFORM_WIN in platform.platform() \
+			   else "/kaggle"
+INPUT_DIR = "input" ## \kaggle\input is read-only
+CHALLENGE_NAME = "feedback-prize-english-language-learning" ## kaggle train, test, and sample submission data
+SUBMISSION_DIR = "working" ## kaggle output folder
+MODELS_DIR = os.path.join(ROOT_DIR, INPUT_DIR, "models")
+## lid.176.ftz is the compressed version of the model, with a file size of 917kB.
+## https://fasttext.cc/docs/en/language-identification.html
+FASTTEXT_MODEL_PATH = os.path.join(MODELS_DIR, "fasttext", "lid.176.ftz")
 
 
 def get_default_device():
@@ -26,8 +30,8 @@ class MSFTDeBertaV3Config:
 			     pooling="mean",
 			     training_device=None,
 				 inference_device=None,
-			     batch_inference=True,
-			     inference_batch_size=100):
+			     batch_transform=True,
+			     batch_transform_size=100):
 		"""
 		manage the deberta model configuration
 		"""
@@ -39,10 +43,10 @@ class MSFTDeBertaV3Config:
 			                   else get_default_device()
 		self.inference_device = inference_device if inference_device \
 		                        else get_default_device()
-		self._batch_inference = batch_inference
-		self._inference_batch_size = inference_batch_size
-		self._models_dir_path = MODELS_DIR_PATH
-		self._model_path = os.path.join(self._models_dir_path, self._model_name)
+		self._batch_transform = batch_transform
+		self._batch_transform_size = batch_transform_size
+		self._models_dir = MODELS_DIR
+		self._model_path = os.path.join(self._models_dir, self._model_name)
 		self.gradient_checkpointing = False
 		self.tokenizer_max_length = 512
 
