@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 
 ## local imports
 from config import MSFTDeBertaV3Config, \
-	               FASTTEXT_MODEL_PATH, \
+	               DEBERTAV3BASE_MODEL, FASTTEXT_MODEL_PATH, \
 				   TRAINING_PARAMS, \
 				   MODEL_TYPE, TEST_SIZE
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
 	## microsfot deberta v3 base model configuration
 	deberta_config = MSFTDeBertaV3Config(
-		model_name="deberta-v3-base",
+		model_name=DEBERTAV3BASE_MODEL,
 		# pooling="mean",         ## "mean" is the only option for now
 		# training_device="cuda", ## use default device, cuda or mps
 		# inference_device="cpu", ## use default device. note: for the efficiency competition part, gpu use is not allowed
@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
 	print("loading training data...")
 	df = model_trainer.load_data() 
-	df_features, y = model_trainer.get_training_set(df.iloc[:50,:]) ## y is a 6-col numpy.ndarray
+	df_features, y = model_trainer.get_training_set(df) #(df.iloc[:50,:]) ## y is a 6-col numpy.ndarray
 	df_features_train, df_features_test, y_train, y_test = \
 		model_trainer.split_data(df_features, y, test_size=TEST_SIZE) ## types: df, df, np array, np array
 

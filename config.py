@@ -82,17 +82,20 @@ TRAINING_PARAMS["nn"] = dict(
 FEATURE_COLUMNS = ["full_text"]
 TARGET_COLUMNS = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions"]
 
+
 ################################################
 ## paths
 ################################################
 PLATFORM_ARM64 = "arm64" ## mac etc.
 PLATFORM_WIN = "Win" ## Windows
+CHALLENGE_NAME = "feedback-prize-english-language-learning" ## Kaggle's train, test, and sample submission data folder
 ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() or PLATFORM_WIN in platform.platform() \
 			   else "/kaggle"
 INPUT_DIR = "input" ## Kaggle's \kaggle\input dir is read-only
-CHALLENGE_NAME = "feedback-prize-english-language-learning" ## Kaggle's train, test, and sample submission data folder
-SUBMISSION_DIR = "working" ## Kaggle's output folder
-MODELS_DIR = os.path.join(ROOT_DIR, INPUT_DIR, "models")
+WORKING_DIR = "working" ## Kaggle's working dir, 20GB
+SUBMISSION_DIR = "working" ## Kaggle's output folder, 20GB
+MODELS_DIR = os.path.join(ROOT_DIR, WORKING_DIR, "models")
+DEBERTAV3BASE_MODEL = "deberta-v3-base"
 ## lid.176.bin, which is faster and slightly more accurate, but has a file size of 126MB;
 ## lid.176.ftz is the compressed version of the model, with a file size of 917kB.
 ## https://fasttext.cc/docs/en/language-identification.html
