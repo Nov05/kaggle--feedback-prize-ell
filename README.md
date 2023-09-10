@@ -1,12 +1,21 @@
 # [**Feedback Prize - English Language Learning**](https://www.kaggle.com/competitions/feedback-prize-english-language-learning)
 Evaluating language knowledge of ELL students from grades 8-12  
 
+* Project Proposal[【goodle docs】](https://docs.google.com/document/d/1euOWdw7vIrkO1fVCuqv4sPNscPVbE-fgF5VcMy9DsAs)
+* Exploratory Data Analysis[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb)  
 
 
+* Kaggle submissions  
+
+|   | **Run** | **Private Score** | **Public Score** | | 
+|-|-|-|-|-|  
+| [Notebook 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
+| [Notebook 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
+| [Notebook 3](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142564633) | - | - | - | train on GPU, infer on CPU |   
 
 ---
 
-【repo update log】  
+### Repo update log 
 
 2023-09-10  
 1. minor refactoring, bug fix, all done  
@@ -14,12 +23,6 @@ Evaluating language knowledge of ELL students from grades 8-12
 3. fasttext and deberta (pre-trained, not fine-tuned) for feature extraction, and hyperparameters of the regressor could be fine-tuned for better result  
 4. add requirements.txt (pip freeze > requirements.txt)     
 5. submitted notebooks in kaggle  
-
-|   | **Run** | **Private Score** | **Public Score** | | 
-|-|-|-|-|-|  
-| [Notebook 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
-| [Notebook 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/notebook?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
-| Notebook 3 | - | - | - | train on GPU, infer on CPU |   
 
 <br>  
 
