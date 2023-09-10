@@ -66,7 +66,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 		self.config:MSFTDeBertaV3Config = config
 		self.tokenizer = AutoTokenizer.from_pretrained(self.config._model_path)
 		self.model = AutoModel.from_pretrained(self.config._model_path).to(self.config.inference_device)
-
+		## this class's model should be run on the inference device
 
 	def fit(self, series, y=None):
 		return self
@@ -97,13 +97,13 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	@torch.no_grad()
 	def feature(self, inputs):
 		self.model.eval()
-		# last_hidden_states = self.model(**{k: v.to(self.config._inference_device) for k, v, in inputs.items()})[0]
+		# last_hidden_states = self.model(**{k: v.to(self.config.inference_device) for k, v, in inputs.items()})[0]
 		last_hidden_states = self.model(
-			**{k: v.to(self.config.training_device) for k, v, in inputs.items()}
+			**{k: v.to(self.config.inference_device) for k, v, in inputs.items()}
 		).last_hidden_state
 		feature = MeanPooling()(
 			last_hidden_states,
-			inputs['attention_mask'].to(self.config.training_device)
+			inputs['attention_mask'].to(self.config.inference_device)
 		)
 		return feature
 

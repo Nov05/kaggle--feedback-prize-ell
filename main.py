@@ -34,7 +34,7 @@ if __name__ == "__main__":
 	)
 
 
-	## there are 2 types of models as regressor available: 
+	## there are 2 types of models available as regressor: 
 	## 1. lightgbm/xgboost/linear/dummy
 	## 2. simple vanilla nueral network
 	model_type = MODEL_TYPE ## options: 'lgb', 'xgb', 'linear", 'dummy' (col mean), 'nn'
