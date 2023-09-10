@@ -12,10 +12,11 @@ from sklearn_transformers import FTLangdetectTransformer, PooledDeBertaTransform
 from english_utils import number_of_unigrams, number_of_line_breaks, get_punctuation_error_fraction
 
 
+
 FEATURE_COLUMNS = ["full_text"]
 
 
-def to_series(df: pd.DataFrame) -> pd.Series:
+def to_series(df:pd.DataFrame) -> pd.Series:
 	assert df.shape[1] == 1
 	return df.iloc[:, 0]
 
@@ -47,10 +48,12 @@ i_pipe = Pipeline(steps=[
 	("i_I_counter", CountVectorizer(vocabulary=["i", "I"], lowercase=False, token_pattern=r"(?u)\b\w\b")),
 	("union", FeatureUnion([
 		("l1_normalizer", Normalizer(norm='l1')),
-		# ("scale_total_count", Pipeline(steps=[
-			# ("sum_columns", FunctionTransformer(lambda x: np.sum(x, axis=1))),
-			("scale", StandardScaler(with_mean=False))
-		# ]))
+		("scale_total_count", Pipeline(steps=[
+			## bug fix: add ".A" to get a ndarray rather than a matrix
+			## https://colab.research.google.com/drive/1ixqwqaGQSL2iTSiZzzqqzzjEOyyjsztk#scrollTo=pDZqLQdhTMsy
+			("sum_columns", FunctionTransformer(lambda x: np.sum(x, axis=1).A)), 
+			("scale", StandardScaler())
+		]))
 	]))
 ])
 
@@ -88,11 +91,11 @@ def make_deberta_pipe(deberta_config):
 
 ## tips: comment off some steps to debug a pipeline
 def make_features_pipeline(fastext_model_path,
-	                       deberta_config: MSFTDeBertaV3Config):
+	                       deberta_config:MSFTDeBertaV3Config):
 	features_pipeline = FeatureUnion([
 		("unigrams_count", number_of_unigrams_pipe),
 		("line_breaks_count", number_of_line_breaks_pipe),
-		("english_score", make_english_score_pipe(fastext_model_path)),
+		("english_score", make_english_score_pipe(fastext_model_path)), 
 		("i_vs_I", i_pipe), 
 		("bad_punctuation", bad_punctuation_pipe),
 		("tf-idf", tf_idf_pipe),

@@ -64,8 +64,6 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	def __init__(self, config):
 		self.config:MSFTDeBertaV3Config = config
-		# self.tokenizer = AutoTokenizer.from_pretrained(self.config.tokenizer)
-		# self.model = AutoModel.from_pretrained(self.config.model).to(self.config.inference_device)
 		self.tokenizer = AutoTokenizer.from_pretrained(self.config._model_path)
 		self.model = AutoModel.from_pretrained(self.config._model_path).to(self.config.inference_device)
 
@@ -113,7 +111,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 	def batch_transform(self, series):
 		y_preds_list = []
 		data_loader = DataLoader(dataset=series,
-								 batch_size=self.config._batch_transform_size,
+								 batch_size=self.config._batch_size,
 								 shuffle=False)
 		for _series in tqdm(data_loader):
 			_inputs = self.prepare_input(_series).to(self.config.inference_device)

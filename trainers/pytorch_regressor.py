@@ -14,7 +14,9 @@ from trainers.base_trainer import TARGET_COLUMNS, \
 	                              ModelTrainer
 
 
-class EllActivation(nn.Module):
+## final activation layer for the ELL task
+## ELL - Kaggle competition: Feedback Prize - English Language Learning
+class ELLActivation(nn.Module):
 	def __init__(self, force_half_points=False):
 		super().__init__()
 		self._force_half_points = force_half_points
@@ -26,10 +28,14 @@ class EllActivation(nn.Module):
 		return y
 
 
+##############################################################
+## fully connected layer(s) + activation layer(s)
+##############################################################
 class SequentialNeuralNetwork(nn.Module):
 	def __init__(self, X, y, hidden_dims=None, n_hidden=3, force_half_points=False):
+		## if hidden_dims is not None, it will override n_hidden
 		assert hidden_dims is not None or n_hidden is not None, \
-			"Either n_hidden or hidden_dims should be non null."
+			"Hint: Either n_hidden or hidden_dims should not be None."
 
 		super(SequentialNeuralNetwork, self).__init__()
 
@@ -40,12 +46,11 @@ class SequentialNeuralNetwork(nn.Module):
 		self._output_dim = y.shape[1]
 		
 		print("model info:")
-		if hidden_dims:
+		if hidden_dims: ## hidden layer dimensions; if hidden_dims isn't None, it will override n_hidden
 			print("hidden_dims:", hidden_dims)
 			self._hidden_dims = hidden_dims
 			self._n_hidden = len(self._hidden_dims)
-
-		if n_hidden:
+		elif n_hidden: ## hidden layer number
 			print("n_hidden:", n_hidden)
 			self._n_hidden = n_hidden
 			self._alpha = (np.log(self._output_dim) / np.log(self._input_dim)) ** (1 / (self._n_hidden + 1))
@@ -59,10 +64,9 @@ class SequentialNeuralNetwork(nn.Module):
 				self._model.append(linear_layer)
 				self._model.append(nn.ReLU())
 			self._model.append(nn.Linear(self._hidden_dims[-1], self._output_dim, bias=True))
-			self._model.append(EllActivation(force_half_points=self._force_half_points))
 		else:
 			self._model.append(nn.Linear(self._input_dim, self._output_dim, bias=True))
-			self._model.append(EllActivation(force_half_points=self._force_half_points))
+		self._model.append(ELLActivation(force_half_points=self._force_half_points))
 		print(self._model)
 
 	def forward(self, x):
@@ -70,7 +74,7 @@ class SequentialNeuralNetwork(nn.Module):
 
 
 ##############################################################
-## fully connected layer(s)
+## using a simple vanilla neural network model
 ##############################################################
 class NNTrainer(ModelTrainer):
 	def __init__(self,
@@ -94,7 +98,7 @@ class NNTrainer(ModelTrainer):
 		self._loss_values = dict()
 		self._training_device = self._deberta_config.training_device
 		self._inference_device = self._deberta_config.inference_device
-		print(f"the troch modal will be trained on {self._training_device}")
+		print(f"this torch model will be trained on {self._training_device}")
 
 
 	def get_data_loader(self, X, y, bactch_size, shuffle=True):
