@@ -104,12 +104,12 @@ FASTTEXT_MODEL_PATH = os.path.join(MODELS_DIR, "fasttext", FASTTEXT_MODEL)
 
 """
 Kaggle directories
-data folder:
-	/kaggle/input/feedback-prize-english-language-learning/sample_submission.csv
-	/kaggle/input/feedback-prize-english-language-learning/train.csv
-	/kaggle/input/feedback-prize-english-language-learning/test.csv
-output folder:
-	/kaggle/working/
+	data files:
+		/kaggle/input/feedback-prize-english-language-learning/sample_submission.csv
+		/kaggle/input/feedback-prize-english-language-learning/train.csv
+		/kaggle/input/feedback-prize-english-language-learning/test.csv
+	output folder:
+		/kaggle/working/
 """
 ## Input data files are available in the read-only "../input/" directory
 ## You can write up to 20GB to the current directory (/kaggle/working/) 
