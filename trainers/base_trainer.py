@@ -12,15 +12,9 @@ from abc import ABC, abstractmethod
 ## local imports
 from config import FASTTEXT_MODEL_PATH, \
 				   MSFTDeBertaV3Config, \
-				   ROOT_DIR, \
-				   INPUT_DIR, \
-				   CHALLENGE_NAME, \
-				   SUBMISSION_DIR
+				   ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, SUBMISSION_DIR, \
+				   FEATURE_COLUMNS, TARGET_COLUMNS
 
-
-## constants
-FEATURE_COLUMNS = ["full_text"]
-TARGET_COLUMNS = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions"]
 
 
 class ModelTrainer(ABC):
@@ -37,12 +31,12 @@ class ModelTrainer(ABC):
 		self._feature_columns = feature_columns
 		self._target_columns = target_columns
 		self._challenge_name = CHALLENGE_NAME
-		self._train_file_name = train_file_name if train_file_name else \
-			os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
-		self._test_file_name = test_file_name if test_file_name else \
-			os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
-		self._submission_file_name = submission_file_name if submission_file_name else \
-			os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
+		self._train_file_name = train_file_name if train_file_name \
+			else os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
+		self._test_file_name = test_file_name if test_file_name \
+			else os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
+		self._submission_file_name = submission_file_name if submission_file_name \
+			else os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 		self._model = None
 		self._pipeline = make_features_pipeline(fastext_model_path=self._fastext_model_path,
 			                                    deberta_config=self._deberta_config)

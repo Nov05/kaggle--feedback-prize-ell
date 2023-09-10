@@ -3,6 +3,7 @@ import torch
 import platform
 
 
+
 ################################################
 ## training hyperparameters
 ################################################
@@ -77,20 +78,41 @@ TRAINING_PARAMS["nn"] = dict(
 )
 
 
+## constants
+FEATURE_COLUMNS = ["full_text"]
+TARGET_COLUMNS = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions"]
+
 ################################################
 ## paths
 ################################################
-PLATFORM_ARM64 = 'arm64' ## mac etc.
-PLATFORM_WIN = 'Win' ## Windows
+PLATFORM_ARM64 = "arm64" ## mac etc.
+PLATFORM_WIN = "Win" ## Windows
 ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() or PLATFORM_WIN in platform.platform() \
 			   else "/kaggle"
 INPUT_DIR = "input" ## Kaggle's \kaggle\input dir is read-only
 CHALLENGE_NAME = "feedback-prize-english-language-learning" ## Kaggle's train, test, and sample submission data folder
 SUBMISSION_DIR = "working" ## Kaggle's output folder
 MODELS_DIR = os.path.join(ROOT_DIR, INPUT_DIR, "models")
+## lid.176.bin, which is faster and slightly more accurate, but has a file size of 126MB;
 ## lid.176.ftz is the compressed version of the model, with a file size of 917kB.
 ## https://fasttext.cc/docs/en/language-identification.html
-FASTTEXT_MODEL_PATH = os.path.join(MODELS_DIR, "fasttext", "lid.176.ftz")
+FASTTEXT_MODEL = "lid.176.ftz" #"lid.176.bin"
+FASTTEXT_MODEL_PATH = os.path.join(MODELS_DIR, "fasttext", FASTTEXT_MODEL)
+
+"""
+Kaggle directories
+data folder:
+	/kaggle/input/feedback-prize-english-language-learning/sample_submission.csv
+	/kaggle/input/feedback-prize-english-language-learning/train.csv
+	/kaggle/input/feedback-prize-english-language-learning/test.csv
+output folder:
+	/kaggle/working/
+"""
+## Input data files are available in the read-only "../input/" directory
+## You can write up to 20GB to the current directory (/kaggle/working/) 
+## that gets preserved as output when you create a version using "Save & Run All" 
+## You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
 
 
 def get_default_device():
@@ -99,6 +121,7 @@ def get_default_device():
 	elif torch.cuda.is_available():
 		return "cuda:0"
 	return "cpu"
+
 
 
 ################################################

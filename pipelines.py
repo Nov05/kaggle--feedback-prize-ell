@@ -7,13 +7,10 @@ from sklearn.preprocessing import FunctionTransformer, StandardScaler, Normalize
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 ## local imports
-from config import FASTTEXT_MODEL_PATH, MSFTDeBertaV3Config
+from config import FEATURE_COLUMNS, FASTTEXT_MODEL_PATH, MSFTDeBertaV3Config
 from sklearn_transformers import FTLangdetectTransformer, PooledDeBertaTransformer
 from english_utils import number_of_unigrams, number_of_line_breaks, get_punctuation_error_fraction
 
-
-
-FEATURE_COLUMNS = ["full_text"]
 
 
 def to_series(df:pd.DataFrame) -> pd.Series:
