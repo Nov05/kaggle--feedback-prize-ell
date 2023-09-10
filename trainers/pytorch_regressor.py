@@ -174,6 +174,7 @@ class NNTrainer(ModelTrainer):
 
 
 	def predict(self, X, recast_scores=True):
+		self._model.to(self._inference_device)
 		y_pred = self._model(Data.csr_to_torch(X).to(self._inference_device)).cpu().detach().numpy()
 		if recast_scores:
 			y_pred = self.recast_scores(y_pred)
