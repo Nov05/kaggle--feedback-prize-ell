@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 
 ## local imports
 from config import MSFTDeBertaV3Config, \
-	               DEBERTAV3BASE_MODEL, FASTTEXT_MODEL_PATH, \
+	               DEBERTAV3BASE_MODEL_PATH, FASTTEXT_MODEL_PATH, \
 				   TRAINING_PARAMS, \
 				   MODEL_TYPE, TEST_SIZE
 
@@ -25,7 +25,8 @@ if __name__ == "__main__":
 
 	## microsfot deberta v3 base model configuration
 	deberta_config = MSFTDeBertaV3Config(
-		model_name=DEBERTAV3BASE_MODEL,
+		model_name='deberta-v3-base',
+		model_path=DEBERTAV3BASE_MODEL_PATH,
 		# pooling="mean",         ## "mean" is the only option for now
 		# training_device="cuda", ## use default device, cuda or mps
 		# inference_device="cpu", ## use default device. note: for the efficiency competition part, gpu use is not allowed
@@ -77,7 +78,7 @@ if __name__ == "__main__":
 	if model_type=='nn':
 		print("ploting losses...")
 		model_trainer.plot_loss_values()
-
+		
 	print("making submission file...")
 	model_trainer.make_submission_df()
 

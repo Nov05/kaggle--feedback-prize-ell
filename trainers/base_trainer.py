@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 ## local imports
 from config import FASTTEXT_MODEL_PATH, \
 				   MSFTDeBertaV3Config, \
-				   ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, SUBMISSION_DIR, \
+				   TRAIN_FILE_PATH, TEST_FILE_PATH, SUBMISSION_FILE_PATH, \
 				   FEATURE_COLUMNS, TARGET_COLUMNS
 
 
@@ -30,13 +30,12 @@ class ModelTrainer(ABC):
 		self._deberta_config = deberta_config
 		self._feature_columns = feature_columns
 		self._target_columns = target_columns
-		self._challenge_name = CHALLENGE_NAME
 		self._train_file_name = train_file_name if train_file_name \
-			else os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
+			else TRAIN_FILE_PATH
 		self._test_file_name = test_file_name if test_file_name \
-			else os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
+			else TEST_FILE_PATH
 		self._submission_file_name = submission_file_name if submission_file_name \
-			else os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
+			else SUBMISSION_FILE_PATH
 		self._model = None
 		self._pipeline = make_features_pipeline(fastext_model_path=self._fastext_model_path,
 			                                    deberta_config=self._deberta_config)

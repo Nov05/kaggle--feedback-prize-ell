@@ -86,28 +86,35 @@ TARGET_COLUMNS = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", 
 ################################################
 ## paths
 ################################################
+## local or kaggle, etc.
 PLATFORM_ARM64 = "arm64" ## mac etc.
 PLATFORM_WIN = "Win" ## Windows
+
+## kaggle dir, local folder structure simulates it
 CHALLENGE_NAME = "feedback-prize-english-language-learning" ## Kaggle's train, test, and sample submission data folder
 ROOT_DIR = "." if PLATFORM_ARM64 in platform.platform() or PLATFORM_WIN in platform.platform() \
 			   else "/kaggle"
 INPUT_DIR = "input" ## Kaggle's \kaggle\input dir is read-only
-WORKING_DIR = "working" ## Kaggle's working dir, 20GB
-SUBMISSION_DIR = "working" ## Kaggle's output folder, 20GB
-MODELS_DIR = os.path.join(ROOT_DIR, WORKING_DIR, "models")
-DEBERTAV3BASE_MODEL = "deberta-v3-base"
-## lid.176.bin, which is faster and slightly more accurate, but has a file size of 126MB;
-## lid.176.ftz is the compressed version of the model, with a file size of 917kB.
-## https://fasttext.cc/docs/en/language-identification.html
-FASTTEXT_MODEL = "lid.176.ftz" #"lid.176.bin"
-FASTTEXT_MODEL_PATH = os.path.join(MODELS_DIR, "fasttext", FASTTEXT_MODEL)
+WORKING_DIR = "working" ## Kaggle's working dir 20GB, outputs are stored here
+SUBMISSION_DIR = WORKING_DIR 
+
+## data files
+TRAIN_FILE_PATH = os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "train.csv")
+TEST_FILE_PATH = os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
+SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
+
+## kaggle input datasets dir, this repo and models will be attached here as datasets
+DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME)
+DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
+FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
 
 """
 Kaggle directories
 	data files:
-		/kaggle/input/feedback-prize-english-language-learning/sample_submission.csv
-		/kaggle/input/feedback-prize-english-language-learning/train.csv
-		/kaggle/input/feedback-prize-english-language-learning/test.csv
+		/kaggle/input/<challenge name>/sample_submission.csv
+		/kaggle/input/<challenge name>/train.csv
+		/kaggle/input/<challenge name>/test.csv
+		/kaggle/input/<challenge name>/<attach different datasets here>
 	output folder:
 		/kaggle/working/
 """
@@ -115,6 +122,10 @@ Kaggle directories
 ## You can write up to 20GB to the current directory (/kaggle/working/) 
 ## that gets preserved as output when you create a version using "Save & Run All" 
 ## You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
+## lid.176.bin, which is faster and slightly more accurate, but has a file size of 126MB ;
+## lid.176.ftz is the compressed version of the model, with a file size of 917kB.
+## https://fasttext.cc/docs/en/language-identification.html
 
 
 
@@ -133,6 +144,7 @@ def get_default_device():
 class MSFTDeBertaV3Config:
 	def __init__(self,
 			     model_name,
+				 model_path,
 			     pooling="mean",
 			     training_device=None,
 				 inference_device=None,
@@ -151,8 +163,7 @@ class MSFTDeBertaV3Config:
 		                        else get_default_device()
 		self._batch_transform = batch_transform
 		self._batch_size = batch_size
-		self._models_dir = MODELS_DIR
-		self._model_path = os.path.join(self._models_dir, self._model_name)
+		self._model_path = model_path
 		self.gradient_checkpointing = False
 		self.tokenizer_max_length = 512
 		print(self)

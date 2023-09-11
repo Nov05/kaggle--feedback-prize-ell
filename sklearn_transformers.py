@@ -66,7 +66,7 @@ class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):
 		self.config:MSFTDeBertaV3Config = config
 		self.tokenizer = AutoTokenizer.from_pretrained(self.config._model_path)
 		self.model = AutoModel.from_pretrained(self.config._model_path).to(self.config.inference_device)
-		## this class's model should be run on the inference device
+		
 
 	def fit(self, series, y=None):
 		return self
