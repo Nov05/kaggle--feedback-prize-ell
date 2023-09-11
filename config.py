@@ -104,7 +104,7 @@ TEST_FILE_PATH = os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME, "test.csv")
 SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 
 ## kaggle input datasets dir, this repo and models will be attached here as datasets
-DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR, CHALLENGE_NAME)
+DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
 DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
 
@@ -114,7 +114,7 @@ Kaggle directories
 		/kaggle/input/<challenge name>/sample_submission.csv
 		/kaggle/input/<challenge name>/train.csv
 		/kaggle/input/<challenge name>/test.csv
-		/kaggle/input/<challenge name>/<attach different datasets here>
+		/kaggle/input/<attach different datasets here>
 	output folder:
 		/kaggle/working/
 """
