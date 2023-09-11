@@ -27,9 +27,9 @@ if __name__ == "__main__":
 	deberta_config = MSFTDeBertaV3Config(
 		model_name='deberta-v3-base',
 		model_path=DEBERTAV3BASE_MODEL_PATH,
-		# pooling="mean",         ## "mean" is the only option for now
-		# training_device="cuda", ## use default device, cuda or mps
-		# inference_device="cpu", ## use default device. note: for the efficiency competition part, gpu use is not allowed
+		# pooling="mean",          ## "mean" is the only option for now
+		# training_device="cuda",  ## use default device, cuda or mps or cpu (you won't want to use cpu for training lol)
+		# inference_device="cuda", ## use default device. note: for the efficiency competition part, gpu use is not allowed
 		batch_transform=True,
 		batch_size=10
 	)

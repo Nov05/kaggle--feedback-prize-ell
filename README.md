@@ -14,8 +14,9 @@
 | [Notebook 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
 | [Notebook 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
 
-\* *from Notebook 2 execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806= 10s, which means almost all time was spent on training and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both on CPU.*     
+\* *Note: from the Notebook 2 execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
 
+* Code in [【GitHub repo】](https://github.com/nov05/kaggle--feedback-prize-ell), or as [【Kaggle dataset】](https://www.kaggle.com/datasets/wenjingliu/kaggle--feedback-prize-ell)  
 ---
 
 ### Repo update log 

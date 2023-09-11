@@ -151,11 +151,12 @@ class MSFTDeBertaV3Config:
 			     batch_transform=True,
 			     batch_size=100):
 		"""
-		manage the deberta model configuration
+			manage the deberta model configuration
 		"""
 		assert pooling=="mean", "We removed all other implementations other than 'mean'."
 
 		self._model_name = model_name
+		self._model_path = model_path
 		self.pooling = pooling
 		self.training_device = training_device if training_device \
 			                   else get_default_device()
@@ -163,7 +164,6 @@ class MSFTDeBertaV3Config:
 		                        else get_default_device()
 		self._batch_transform = batch_transform
 		self._batch_size = batch_size
-		self._model_path = model_path
 		self.gradient_checkpointing = False
 		self.tokenizer_max_length = 512
 		print(self)
