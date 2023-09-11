@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
 	print("loading training data...")
 	df = model_trainer.load_data() 
-	df_features, y = model_trainer.get_training_set(df.iloc[:50,:]) ## y is a 6-col numpy.ndarray
+	df_features, y = model_trainer.get_training_set() #(df.iloc[:50,:]) ## y is a 6-col numpy.ndarray
 	df_features_train, df_features_test, y_train, y_test = \
 		model_trainer.split_data(df_features, y, test_size=TEST_SIZE) ## types: df, df, np array, np array
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 	if model_type=='nn':
 		print("ploting losses...")
 		model_trainer.plot_loss_values()
-		
+
 	print("making submission file...")
 	model_trainer.make_submission_df()
 
