@@ -14,6 +14,7 @@ from config import MSFTDeBertaV3Config
 from english_utils import clean_special_characters
 
 
+
 def ft_langdetect(text: str, fasttext_model):
 	labels, scores = fasttext_model.predict(text)
 	label = labels[0].replace("__label__", '')
@@ -22,10 +23,12 @@ def ft_langdetect(text: str, fasttext_model):
 		    "score": score}
 
 
+
 def ftlangdetect_english_score(series: pd.Series, fasttext_model) -> np.array:
 	""""""
 	res = series.apply(lambda x: ft_langdetect(clean_special_characters(x), fasttext_model))
 	return res.apply(lambda x: x['score'] if x["lang"] == 'en' else 1 - x['score']).values.reshape(-1, 1)
+
 
 
 class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
@@ -59,6 +62,7 @@ class FTLangdetectTransformer(BaseEstimator, TransformerMixin):
 		check_is_fitted(self, ['_model'])
 		res = series.apply(lambda x: self.ft_langdetect(clean_special_characters(x)))
 		return res.apply(lambda x: x['score'] if x["lang"] == 'en' else 1 - x['score']).values.reshape(-1, 1)
+
 
 
 class PooledDeBertaTransformer(BaseEstimator, TransformerMixin):

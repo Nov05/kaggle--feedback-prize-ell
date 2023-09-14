@@ -6,34 +6,32 @@ from sklearn.linear_model import LinearRegression
 
 ## local imports
 from config import MSFTDeBertaV3Config
-from trainers.base_trainer import TARGET_COLUMNS, \
-                                  FEATURE_COLUMNS, \
-	                              ModelTrainer
+from trainers.base_trainers import SklearnTrainer
+
+
 
 ##############################################################
 ## one of such models: dummy (mean), linear, XGBoost, LightGBM
 ##############################################################
-class SklearnRegressorTrainer(ModelTrainer):
+class SklearnRegressorTrainer(SklearnTrainer):
 
 	def __init__(self,
-		  		 model_type,
-				 fastext_model_path=None,
+			  	 model_type='lgb', ## different regressor: 'lgb', 'xgb', 'linear', 'dummy'(mean)
+                 fastext_model_path=None,
 				 deberta_config:MSFTDeBertaV3Config=None,
-				 target_columns=TARGET_COLUMNS,
-				 feature_columns=FEATURE_COLUMNS,
+				 target_columns=None,
+				 feature_columns=None,
 				 train_file_name=None,
 				 test_file_name=None,
 				 submission_file_name=None):
-		super().__init__(
-			             fastext_model_path=fastext_model_path,
-						 deberta_config=deberta_config,
-						 target_columns=target_columns,
+		super().__init__(fastext_model_path=fastext_model_path,
+				         deberta_config=deberta_config,
+			             target_columns=target_columns,
 						 feature_columns=feature_columns,
 						 train_file_name=train_file_name,
 						 test_file_name=test_file_name,
 						 submission_file_name=submission_file_name)
 		self._model_type = model_type
-
 
 	def train(self, X, y, params=None):
 		if self._model_type == "lgb":

@@ -4,14 +4,13 @@ import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import default_collate
 from torch.utils.data import DataLoader
-from sklearn.model_selection import train_test_split # replace
+from sklearn.model_selection import train_test_split
 
 ## local imports
-from torch_utils import Data
+from torch_utils import SkleanDataset
 from config import MSFTDeBertaV3Config
-from trainers.base_trainer import TARGET_COLUMNS, \
-	                              FEATURE_COLUMNS, \
-	                              ModelTrainer
+from trainers.base_trainers import SklearnTrainer
+
 
 
 ## final activation layer for the ELL task
@@ -26,6 +25,7 @@ class ELLActivation(nn.Module):
 		if self._force_half_points:
 			y = torch.round(y * 2) / 2
 		return y
+
 
 
 ##############################################################
@@ -73,21 +73,22 @@ class SequentialNeuralNetwork(nn.Module):
 		return self._model(x)
 
 
+
 ##############################################################
 ## using a simple vanilla neural network model
 ##############################################################
-class NNTrainer(ModelTrainer):
+class NNTrainer(SklearnTrainer):
 	def __init__(self,
-				 fastext_model_path,
-			     deberta_config:MSFTDeBertaV3Config,
-				 target_columns=TARGET_COLUMNS,
-				 feature_columns=FEATURE_COLUMNS,
+				 fastext_model_path=None,
+				 deberta_config:MSFTDeBertaV3Config=None,
+				 target_columns=None,
+				 feature_columns=None,
 				 train_file_name=None,
 				 test_file_name=None,
 				 submission_file_name = None):
-		super().__init__(fastext_model_path,
-						 deberta_config,
-						 target_columns=target_columns,
+		super().__init__(fastext_model_path=fastext_model_path,
+				         deberta_config=deberta_config,
+			             target_columns=target_columns,
 						 feature_columns=feature_columns,
 						 train_file_name=train_file_name,
 						 test_file_name=test_file_name,
@@ -98,11 +99,11 @@ class NNTrainer(ModelTrainer):
 		self._loss_values = dict()
 		self._training_device = self._deberta_config.training_device
 		self._inference_device = self._deberta_config.inference_device
-		print(f"this torch model will be trained on {self._training_device}")
+		print(f"this torch regressor will be trained on {self._training_device}")
 
 
 	def get_data_loader(self, X, y, bactch_size, shuffle=True):
-		data = Data(X, y)
+		data = SkleanDataset(X, y)
 		data_loader = DataLoader(dataset=data,
 							 	 batch_size=bactch_size,
 								 shuffle=shuffle,
@@ -132,7 +133,7 @@ class NNTrainer(ModelTrainer):
 			train_data_loader = self.get_data_loader(X, y, params["batch_size"], params["shuffle"])
 
 		## start training
-		for epoch in range(params["num_epochs"]):
+		for _ in range(params["num_epochs"]):
 			epoch_loss_values = dict(train=[])
 
 			for X_train, y_train in train_data_loader:
@@ -163,6 +164,7 @@ class NNTrainer(ModelTrainer):
 
 
 	def plot_loss_values(self):
+		print("plotting losses...")
 		fig, ax = plt.subplots(figsize=(20, 5))
 		ax.plot(np.array(self._loss_values["train"]), label="training")
 		if "val" in self._loss_values.keys():
@@ -175,7 +177,7 @@ class NNTrainer(ModelTrainer):
 
 	def predict(self, X, recast_scores=True):
 		self._model.to(self._inference_device)
-		y_pred = self._model(Data.csr_to_torch(X).to(self._inference_device)).cpu().detach().numpy()
+		y_pred = self._model(SkleanDataset.csr_to_torch(X).to(self._inference_device)).cpu().detach().numpy()
 		if recast_scores:
 			y_pred = self.recast_scores(y_pred)
 		return y_pred

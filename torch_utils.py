@@ -1,13 +1,15 @@
 import numpy as np
 from scipy.sparse import csr_matrix
-
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset 
 
+## local imports
+from config import FEATURE_COLUMNS, TARGET_COLUMNS
 
 
-class Data(Dataset):
+
+class SkleanDataset(Dataset):
 	@classmethod
 	def csr_to_torch(cls, X):
 		if isinstance(X, csr_matrix):
@@ -32,10 +34,45 @@ class Data(Dataset):
 		return self.len
 
 
+## convert a dataframe to tokenized inputs and targets
+class EssayDataset(Dataset):
+    def __init__(self, df, config, tokenizer=None, is_test=False):
+        self.df = df.reset_index(drop=True)
+        self.classes = TARGET_COLUMNS
+        self.max_len = config['max_length']
+        self.tokenizer = tokenizer
+        self.is_test = is_test
+
+
+    def __getitem__(self,idx):
+        sample = self.df['full_text'][idx]
+        tokenized = self.tokenizer.encode_plus(sample,
+                                               None,
+                                               add_special_tokens=True,
+                                               max_length=self.max_len,
+                                               truncation=True,
+                                               padding='max_length')
+        inputs = {
+            "input_ids": torch.tensor(tokenized['input_ids'], dtype=torch.long),
+            "token_type_ids": torch.tensor(tokenized['token_type_ids'], dtype=torch.long),
+            "attention_mask": torch.tensor(tokenized['attention_mask'], dtype=torch.long)
+        }
+        if self.is_test:
+            return inputs
+        else:
+            labels = self.df.loc[idx, self.classes].to_list()
+            targets = {"labels": torch.tensor(labels, dtype=torch.float32)}
+            return inputs, targets
+
+
+    def __len__(self):
+        return len(self.df)
+	
+
 
 class MeanPooling(nn.Module):  
 	def __init__(self, clamp_min=1e-9):
-		super(MeanPooling, self).__init__()
+		super().__init__()
 		self._clamp_min = clamp_min
 
 
