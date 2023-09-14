@@ -218,6 +218,7 @@ class DebertaTrainer(ModelTrainer):
         preds = torch.concat(preds).numpy()
         self.clear()
         if recast_scores:
+            print(f"recasting scores...")
             preds = self.recast_scores(preds)
         if write_file:
             submission_df = super().load_data(is_test=True)

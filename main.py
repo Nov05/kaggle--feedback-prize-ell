@@ -1,3 +1,4 @@
+import sys
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -24,14 +25,26 @@ from trainers.deberta_trainer import DebertaTrainer
 
 if __name__ == "__main__":
 
+
+	## $python main.py deberta 0
+	if sys.argv[1]:
+		model_type = sys.argv[1]
+	else:
+		model_type = 'deberta'
+
+	if sys.argv[2]:
+		recast_scores = int(sys.argv[2])
+	else:
+		recast_scores = True
+	print(f"model type: {model_type}")
+	print(f"recast scores: {recast_scores}")
+
+
 	## there are 2 types of skelearn models available as regressor: 
 	## 1. lightgbm/xgboost/linear/dummy: 'lgb', 'xgb', 'linear", 'dummy'(mean)
 	## 2. simple vanilla nueral network: 'nn'(nueral network)
 	## there is 1 type of deberta model available
 	## 1. deberta-vs-base finetuned model: 'deberta'
-	model_type = 'deberta'
-	print(f"model type: {model_type}")
-
 	if model_type in ['nn', 'lgb', 'xbg', 'linear', 'dummy']:
 		## microsoft deberta v3 base model configuration
 		deberta_config = MSFTDeBertaV3Config(
@@ -41,7 +54,7 @@ if __name__ == "__main__":
 			# training_device="cuda",  ## use default device, cuda or mps or cpu (you won't want to use cpu for training lol)
 			# inference_device="cuda", ## use default device. note: for the efficiency competition part, gpu use is not allowed
 			batch_transform=True,
-			batch_size=10
+			batch_size=8
 		)
 
 	## create model trainer
@@ -78,6 +91,6 @@ if __name__ == "__main__":
 		if model_type=='nn':
 			model_trainer.plot_loss_values()
 
-	model_trainer.test()
+	model_trainer.test(recast_scores=recast_scores)
 
 	print("all done")
