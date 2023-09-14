@@ -97,7 +97,7 @@ class ModelTrainer(ABC):
 
 	def make_submission_file(self, submission_df, y_pred_submission):
 		submission_df[self._target_columns] = y_pred_submission
-		submission_df = submission_df[self._feature_columns + self._target_columns]
+		submission_df = submission_df[['text_id'] + self._target_columns]
 		print(f"writing submission to: '{self._submission_file_name}'")
 		submission_df.to_csv(self._submission_file_name, index=False)
 	
