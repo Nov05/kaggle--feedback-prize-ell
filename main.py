@@ -13,30 +13,36 @@ from trainers.deberta_trainer import DebertaTrainer
 
 
 
-#################################################################################
-##
-##    This repo is dedicated to the following NLP task, aka. ELL or FB3
-##    Kaggle competition: Feedback Prize - English Language Learning
-##
-#################################################################################
+################################################################################
+"""
+    This repo is dedicated to the following NLP task, aka. ELL or FB3
+	Kaggle competition: Feedback Prize - English Language Learning
+"""
 ## https://www.kaggle.com/competitions/feedback-prize-english-language-learning
+## 
+################################################################################
 
 
 
 if __name__ == "__main__":
 
-
-	## $python main.py deberta 0
-	if sys.argv[1]:
-		model_type = sys.argv[1]
-	else:
+	## $python <model_type> <recast_scores>
+	##     e.g. $python main.py deberta 0
+	try:
+		if sys.argv[1]:
+			model_type = sys.argv[1]
+		else:
+			model_type = 'deberta'
+	except:
 		model_type = 'deberta'
-
-	if sys.argv[2]:
-		recast_scores = int(sys.argv[2])
-	else:
-		recast_scores = True
 	print(f"model type: {model_type}")
+	try:
+		if sys.argv[2]:
+			recast_scores = bool(int(sys.argv[2]))
+		else:
+			recast_scores = False
+	except:
+		recast_scores = False
 	print(f"recast scores: {recast_scores}")
 
 
@@ -92,5 +98,4 @@ if __name__ == "__main__":
 			model_trainer.plot_loss_values()
 
 	model_trainer.test(recast_scores=recast_scores)
-
 	print("all done")

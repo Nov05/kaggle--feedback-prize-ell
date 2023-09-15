@@ -66,7 +66,7 @@ def get_default_device():
 
 
 ################################################
-## Microsoft DeBerta V3 model configuration
+## deberta-v3-base embedding as a feature extractor
 ################################################
 class MSFTDeBertaV3Config:
 	def __init__(self,
@@ -76,7 +76,7 @@ class MSFTDeBertaV3Config:
 			     training_device=None,
 				 inference_device=None,
 			     batch_transform=True,
-			     batch_size=100):
+			     batch_size=10):
 		"""
 			manage the deberta model configuration
 		"""
@@ -175,10 +175,9 @@ TRAINING_PARAMS["nn"] = dict(
 	force_half_points=False,
 )
 
-## for fine-turning the deberta-ve-base model
+## for fine-turning the deberta-v3-base model EssayModel
 TRAINING_PARAMS["debertav3base"] = {
-    # 'model': 'microsoft/deberta-v3-base', ## huggingface model's name or path
-	'model': DEBERTAV3BASE_MODEL_PATH,
+	'model': DEBERTAV3BASE_MODEL_PATH, ## 'microsoft/deberta-v3-base'
     'dropout': 0.5,
     'max_length': 512,
     'batch_size': 8, ## any number larger than 8 causes in CUDA OOM for unfreezed encoder on Kaggle GPU
