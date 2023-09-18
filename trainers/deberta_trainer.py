@@ -8,7 +8,7 @@ import gc
 ## local imports
 from torch_utils import EssayDataset
 from trainers.base_trainers import ModelTrainer
-from config import TEST_SIZE, TRAINING_PARAMS, \
+from config import TRAINING_PARAMS, \
                    DEBERTA_FINETUNED_MODEL_PATH
 from deberta_models import EssayModel
 
@@ -18,7 +18,7 @@ class DebertaTrainer(ModelTrainer):
     def __init__(self, 
                  model=None, ## fine-tuned model object
                  model_path=DEBERTA_FINETUNED_MODEL_PATH, ## path to fine-tuned model .pth
-                 config=TRAINING_PARAMS["debertav3base"], ## config dict
+                 config=TRAINING_PARAMS["deberta"], ## training config dict
                  tokenizer=None,
                  accelerator=None,
                  target_columns=None,
@@ -68,10 +68,15 @@ class DebertaTrainer(ModelTrainer):
         return tokenizer
 
 
+    @staticmethod
+    def class_to_dict():
+        pass
+
+
     def _get_datasets(self, file_name=None, is_test=False):
         df = self.load_data(file_name, is_test=is_test)
         if not is_test:
-            df_train, df_val = self.split_data(df, test_size=TEST_SIZE)
+            df_train, df_val = self.split_data(df, test_size=self.config.test_size)
             train_dataset = EssayDataset(df_train, self.config, tokenizer=self.tokenizer, is_test=is_test)
             val_dataset = EssayDataset(df_val, self.config, tokenizer=self.tokenizer, is_test=is_test)
             return train_dataset, val_dataset
@@ -120,6 +125,7 @@ class DebertaTrainer(ModelTrainer):
 
 
     def train_one_epoch(self, epoch):
+        self.model.train()
         running_loss = 0.
         progress = tqdm(self.train_loader, total=len(self.train_loader))
         for idx,(inputs,targets) in enumerate(progress):
@@ -135,10 +141,12 @@ class DebertaTrainer(ModelTrainer):
                 del inputs, targets, outputs, loss
         train_loss = running_loss / len(self.train_loader)
         self.train_losses.append(train_loss)
+        self.clear()
 
 
     @torch.no_grad()
     def eval_one_epoch(self, epoch):
+        self.model.eval()
         running_loss = 0.
         eval_progress = tqdm(self.val_loader, total=len(self.val_loader), desc="evaluating...")
         for (inputs,targets) in eval_progress:
@@ -148,6 +156,7 @@ class DebertaTrainer(ModelTrainer):
             del inputs, targets, outputs, loss
         val_loss = running_loss / len(self.val_loader)
         self.val_losses.append(val_loss)
+        self.clear()
 
 
     def train(self):
@@ -156,14 +165,10 @@ class DebertaTrainer(ModelTrainer):
                               leave=True,
                               desc="training...")
         for epoch in train_progress:
-            self.model.train()
             train_progress.set_description(f"EPOCH {epoch} / {self.config['epochs']} | training...")
             self.train_one_epoch(epoch)
-            self.clear()
-            self.model.eval()
             train_progress.set_description(f"EPOCH {epoch} / {self.config['epochs']} | validating...")
             self.eval_one_epoch(epoch)
-            self.clear()
             print(f"{'='*10} EPOCH {epoch} / {self.config['epochs']} {'='*10}")
             print(f"train loss: {self.train_losses[-1]}")
             print(f"val loss: {self.val_losses[-1]}\n\n")
@@ -171,6 +176,7 @@ class DebertaTrainer(ModelTrainer):
 
     @torch.no_grad()
     def test(self, test_loader=None, recast_scores=True, write_file=True):
+        self.model.eval()
         if not test_loader:
             print(f"loading test data from: '{self._test_file_name}'")
             test_dataset = self._get_datasets(is_test=True)

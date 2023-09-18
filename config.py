@@ -34,6 +34,7 @@ DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
 DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
 DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
+DEBERTA_FINETUNED_CONFIG_PATH = os.path.join(DATASETS_DIR, "models", "config.pth")
 
 """
 Kaggle directories
@@ -176,7 +177,7 @@ TRAINING_PARAMS["nn"] = dict(
 )
 
 ## for fine-turning the deberta-v3-base model EssayModel
-TRAINING_PARAMS["debertav3base"] = {
+TRAINING_PARAMS["deberta"] = {
 	'model': DEBERTAV3BASE_MODEL_PATH, ## 'microsoft/deberta-v3-base'
     'dropout': 0.5,
     'max_length': 512,
@@ -187,5 +188,64 @@ TRAINING_PARAMS["debertav3base"] = {
     'scheduler': 'CosineAnnealingWarmRestarts',
     'gradient_accumulation_steps': 2,
     'adam_eps': 1e-6, # 1e-8 default
-    'freeze_encoder': True	
+    'freeze_encoder': True,
+	'test_size': TEST_SIZE,
 }
+
+
+## config for deberta_models.FB3Model
+class FB3Config:
+	## model construction
+	model_name = "microsoft/deberta-v3-base"
+	model_path = DEBERTAV3BASE_MODEL_PATH
+	finetuned_model_path = DEBERTA_FINETUNED_MODEL_PATH
+	finetuned_config_path = DEBERTA_FINETUNED_CONFIG_PATH
+	pooling = 'attention' ## options: mean, max, min, attention, weightedlayer
+	target_columns = TARGET_COLUMNS
+	num_targets = len(target_columns)
+
+	## training
+	freeze = True
+	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+	batch_size, num_workers = 8, 4
+	epochs, print_freq = 5, 20 ## print every 20 steps when training    
+	save_all_models = False ## save model at end of every epoch
+    
+	loss_func = 'SmoothL1' ## 'SmoothL1', 'RMSE'
+	gradient_checkpointing = True
+	gradient_accumulation_steps = 1
+	max_grad_norm = 1000 ## gradient clipping
+	apex = True ## whether using Automatic Mixed Precision 
+    
+    ## layerwise learning rate decay
+	layerwise_lr, layerwise_lr_decay = 5e-5, 0.9
+	layerwise_weight_decay = 0.01
+	layerwise_adam_epsilon = 1e-6
+	layerwise_use_bertadam = False
+    
+	scheduler = 'cosine'
+	num_cycles, num_warmup_steps= 0.5, 0
+	encoder_lr, decoder_lr, min_lr  = 2e-5, 2e-5, 1e-6
+	max_len = 512
+	weight_decay = 0.01
+    
+	fgm = True ## whether using FGM (Fast Gradient Method) adversarial training algorith
+	adv_lr, adv_eps, eps, betas = 1, 0.2, 1e-6, (0.9, 0.999)
+	unscale = True
+    
+	## Multilabel Stratified K-Fold
+	n_fold = 4
+	trn_fold = list(range(n_fold))
+
+	seed = 42 ## random seed
+	debug = False ## debug mode，using only a few training data, n_fold=2，epoch=2
+	wandb = False ## whether using Weights & Biaes to log training information
+	
+	# OUTPUT_DIR = f"./{model_name.replace('/', '-')}/"
+	# train_file = '../input/feedback-prize-english-language-learning/train.csv'
+	# test_file = '../input/feedback-prize-english-language-learning/test.csv'
+	# submission_file = '../input/feedback-prize-english-language-learning/sample_submission.csv'	
+	output_dir = WORKING_DIR
+	train_file = TRAIN_FILE_PATH
+	test_file = TEST_FILE_PATH
+	submission_file = SUBMISSION_FILE_PATH

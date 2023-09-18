@@ -18,9 +18,8 @@ from trainers.deberta_trainer import DebertaTrainer
     This repo is dedicated to the following NLP task, aka. ELL or FB3
 	Kaggle competition: Feedback Prize - English Language Learning
 """
-## https://www.kaggle.com/competitions/feedback-prize-english-language-learning
-## 
 ################################################################################
+## https://www.kaggle.com/competitions/feedback-prize-english-language-learning
 
 
 
@@ -29,34 +28,28 @@ if __name__ == "__main__":
 	## $python <model_type> <recast_scores>
 	##     e.g. $python main.py deberta 0
 	try:
-		if sys.argv[1]:
-			model_type = sys.argv[1]
-		else:
-			model_type = 'deberta'
+		if sys.argv[1]: model_type = sys.argv[1]
 	except:
-		model_type = 'deberta'
+		model_type = 'nn'
 	print(f"model type: {model_type}")
 	try:
-		if sys.argv[2]:
-			recast_scores = bool(int(sys.argv[2]))
-		else:
-			recast_scores = False
+		if sys.argv[2]: recast_scores = bool(int(sys.argv[2]))
 	except:
 		recast_scores = False
 	print(f"recast scores: {recast_scores}")
 
 
 	## there are 2 types of skelearn models available as regressor: 
-	## 1. lightgbm/xgboost/linear/dummy: 'lgb', 'xgb', 'linear", 'dummy'(mean)
-	## 2. simple vanilla nueral network: 'nn'(nueral network)
+	##     1. lightgbm/xgboost/linear/dummy: 'lgb', 'xgb', 'linear", 'dummy'(mean)
+	##     2. simple vanilla nueral network: 'nn'(nueral network)
 	## there is 1 type of deberta model available
-	## 1. deberta-vs-base finetuned model: 'deberta'
+	##     1. deberta-vs-base finetuned model: 'deberta'
 	if model_type in ['nn', 'lgb', 'xbg', 'linear', 'dummy']:
 		## microsoft deberta v3 base model configuration
 		deberta_config = MSFTDeBertaV3Config(
 			model_name='deberta-v3-base',
 			model_path=DEBERTAV3BASE_MODEL_PATH,
-			# pooling="mean",          ## "mean" is the only option for now
+			# pooling="mean",          ## "mean" is the only option for this model
 			# training_device="cuda",  ## use default device, cuda or mps or cpu (you won't want to use cpu for training lol)
 			# inference_device="cuda", ## use default device. note: for the efficiency competition part, gpu use is not allowed
 			batch_transform=True,
