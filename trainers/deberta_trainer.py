@@ -1,7 +1,9 @@
 
 import torch
 from transformers import AutoTokenizer
+from torch.optim import AdamW
 from accelerate import Accelerator
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import gc
 import os
@@ -11,7 +13,7 @@ from torch_utils import EssayDataset
 from trainers.base_trainers import ModelTrainer
 from config import DEBERTA_FINETUNED_MODEL_PATH, \
                    TRAINING_PARAMS, \
-                   CustomeDebertaModelConfig, CFG
+                   CustomeDebertaModelConfig, CFG, TEST_SIZE
 from deberta_models import EssayModel, \
                            CustomDebertaModel, FB3Model
 
@@ -40,11 +42,11 @@ class DebertaTrainer(ModelTrainer):
 
         self.model_path = model_path ## fine-tuned model
         self.config = config 
+        self.is_test = is_test
         self.accelerator = accelerator if accelerator else self._get_accelerator()
         self.model = model if model else self.get_model(self.config, self.model_path, self.accelerator)
         self.tokenizer = tokenizer if tokenizer else self.get_tokenizer(config.model_path) ## deberta-v3-base
         self.input_keys = ['input_ids', 'token_type_ids', 'attention_mask']
-        self.is_test = is_test
 
         ## if a saved model is loaded for inference only, there won't be train-val loaders etc.
         if not is_test:
@@ -65,8 +67,11 @@ class DebertaTrainer(ModelTrainer):
         # model = EssayModel(config)
         # model = CustomDebertaModel(config)
         model = FB3Model(config)
-        model_checkpoint = torch.load(model_path,
-                                      map_location=accelerator.device)
+        if accelerator:
+            model_checkpoint = torch.load(model_path,
+                                          map_location=accelerator.device)
+        else:
+            model_checkpoint = torch.load(model_path)
         print(f"loading model state dict from: '{model_path}'")
         model.load_state_dict(model_checkpoint['model'], strict=False)
         return model
@@ -79,20 +84,23 @@ class DebertaTrainer(ModelTrainer):
 
 
     @staticmethod
-    def class_to_dict():
-        pass
+    def split_data(df, test_size, random_state=42):
+        df_train, df_test = train_test_split(df, 
+                                             test_size=test_size, 
+                                             random_state=random_state)
+        return df_train, df_test
 
 
     def _get_datasets(self, file_name=None, is_test=False):
         df = self.load_data(file_name, is_test=is_test)
-        if not is_test:
-            df_train, df_val = self.split_data(df, test_size=self.config.test_size)
+        if is_test:
+            test_dataset = EssayDataset(df, self.config, tokenizer=self.tokenizer, is_test=is_test)
+            return test_dataset
+        else:
+            df_train, df_val = self.split_data(df, test_size=TEST_SIZE)
             train_dataset = EssayDataset(df_train, self.config, tokenizer=self.tokenizer, is_test=is_test)
             val_dataset = EssayDataset(df_val, self.config, tokenizer=self.tokenizer, is_test=is_test)
             return train_dataset, val_dataset
-        else:
-            test_dataset = EssayDataset(df, self.config, tokenizer=self.tokenizer, is_test=is_test)
-            return test_dataset
     
 
     def _get_data_loader(self, dataset):
@@ -109,13 +117,50 @@ class DebertaTrainer(ModelTrainer):
         return accelerator
     
 
+    def _get_optimizer_grouped_parameters(self,
+                                          model, 
+                                          layerwise_lr,
+                                          layerwise_weight_decay,
+                                          layerwise_lr_decay):
+
+        no_decay = ["bias", "LayerNorm.weight"]
+        # initialize lr for task specific layer
+        optimizer_grouped_parameters = \
+            [{"params": [p for n, p in model.named_parameters() if "model" not in n],
+              "weight_decay": 0.0,
+              "lr": layerwise_lr}]
+        # initialize lrs for every layer of deberta-v3-base
+        layers = [model.model.embeddings] + list(model.model.encoder.layer)
+        layers.reverse()
+        lr = layerwise_lr
+        for layer in layers:
+            optimizer_grouped_parameters += \
+                [{"params": [p for n, p in layer.named_parameters() if not any(nd in n for nd in no_decay)],
+                  "weight_decay": layerwise_weight_decay,"lr": lr,},
+                 {"params": [p for n, p in layer.named_parameters() if any(nd in n for nd in no_decay)],
+                 "weight_decay": 0.0,"lr": lr,},]
+            lr *= layerwise_lr_decay
+        return optimizer_grouped_parameters
+
+
     def _get_optimizer(self):
-        no_decay = ['bias', 'LayerNorm.weight']
-        optimizer_grouped_parameters = [
-            {'params': [p for n,p in self.model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
-            {'params': [p for n,p in self.model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
-        ]
-        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.config.lr, eps=self.config.adam_eps)
+        # no_decay = ['bias', 'LayerNorm.weight']
+        # optimizer_grouped_parameters = [
+        #     {'params': [p for n,p in self.model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
+        #     {'params': [p for n,p in self.model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+        # ]
+        # optimizer = torch.optim.AdamW(optimizer_grouped_parameters, 
+        #                               lr=self.config['lr'], 
+        #                               eps=self.config['adam_eps'])
+        grouped_optimizer_params = self._get_optimizer_grouped_parameters(
+            self.model, 
+            self.config.layerwise_lr,
+            self.config.layerwise_weight_decay,
+            self.config.layerwise_lr_decay
+            )
+        optimizer = AdamW(grouped_optimizer_params,
+                          lr=self.config.layerwise_lr,
+                          eps=self.config.layerwise_adam_epsilon)
         return optimizer
     
 
@@ -155,7 +200,7 @@ class DebertaTrainer(ModelTrainer):
 
 
     @torch.no_grad()
-    def eval_one_epoch(self, epoch):
+    def eval_one_epoch(self):
         self.model.eval()
         running_loss = 0.
         eval_progress = tqdm(self.val_loader, total=len(self.val_loader), desc="evaluating...")
@@ -185,28 +230,36 @@ class DebertaTrainer(ModelTrainer):
 
 
     @torch.no_grad()
-    def test(self, test_loader=None, recast_scores=True, write_file=True):
-        self.model.eval()
-        if not test_loader:
+    def test(self, 
+             data_loader=None, 
+             recast_scores=True, 
+             write_submission_file=True):
+
+        if not data_loader:
             print(f"loading test data from: '{self._test_file_name}'")
             test_dataset = self._get_datasets(is_test=True)
-            test_loader = self._get_data_loader(test_dataset)
+            data_loader = self._get_data_loader(test_dataset)
 
-        self.model, test_loader = self.accelerator.prepare(self.model, test_loader)
+        self.model, data_loader = self.accelerator.prepare(self.model, data_loader)
         print(f"inference device: {self.accelerator.device}")
 
-        test_progress = tqdm(test_loader, total=len(test_loader), desc="testing...")
+        self.model.eval()
+        test_progress = tqdm(data_loader, total=len(data_loader), desc="inferring...")
         preds = []
-        for (inputs) in test_progress:
-            with torch.no_grad():
-                outputs = self.model(inputs)
+        for (inputs,_) in test_progress:
+            # with torch.no_grad():
+            outputs = self.model(inputs)
             preds.append(outputs.detach().cpu())
-        preds = torch.concat(preds).numpy()
+        preds = torch.concat(preds).numpy()     
         self.clear()
+
         if recast_scores:
             print(f"recasting scores...")
             preds = self.recast_scores(preds)
-        if write_file:
+        else:
+            print(f"no recasting scores")
+
+        if write_submission_file:
             submission_df = super().load_data(is_test=True)
             super().make_submission_file(submission_df, preds)
         return preds

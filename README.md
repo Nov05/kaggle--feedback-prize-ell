@@ -16,15 +16,17 @@
 
 | Notebook Version | **Run** | **Private Score** | **Public Score** | | 
 |-|-|-|-|-|  
-| [v1 - dummy](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline | 
-| [v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | **0.470323** | 0.466773 | train and infer on GPU |
-| [v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
-| [v12 - deberta](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | **80.9s** - GPU T4 x2 | 0.846934 | 0.836776 | fine-tuned deberta-v3-base, 7 epochs, with Accelerate |
-| [v13 - deberta](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143052069) | 99.8s - GPU T4 x2 | 0.836189 | 0.795700 | fine-tuned deberta, 30 epochs |
+| [n1v1 - dummy](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline | 
+| [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | **0.470323** | 0.466773 | train and infer on GPU |
+| [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
+| [n1v12 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | **80.9s** - GPU T4 x2 | 0.846934 | 0.836776 | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
+| [n1v13 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143052069) | 99.8s - GPU T4 x2 | 0.836189 | 0.795700 | fine-tuned custom deberta, 30 epochs, infer only |  
+| [n2v1 - deberta 2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | 0.440395 | 0.441242 | fine-tuned custom, 5 epochs, train and infer |
 
 ***Note:***  
-*1. from the Notebook-v7 execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
-*2. from v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training.*  
+*1. From the Notebook1-v7 execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
+*2. From v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training.*  
+*3. Submission n2v1 used a different cutome model, which has an `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could *  
 
  <br>
 

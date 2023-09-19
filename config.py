@@ -256,10 +256,10 @@ class CFG:
 	model_name = "microsoft/deberta-v3-base"
 	model_path = DEBERTAV3BASE_MODEL_PATH
 
-	batch_size ,n_targets,num_workers = 8,6,4
+	batch_size, n_targets, num_workers = 8, 6, 4 ## batch_size=8 kaggle upper limit
 	target_cols = ['cohesion', 'syntax', 'vocabulary', 'phraseology', 'grammar', 'conventions']
-	epochs,print_freq = 5,20 # 训练时每隔20step打印一次    
-	save_all_models=False # 是否每个epoch都保存数据
+	epochs, print_freq = 5, 20 # 训练时每隔20step打印一次    
+	save_all_models = False # 是否每个epoch都保存数据
 	gradient_checkpointing = True
 
 	loss_func = 'SmoothL1' # 'SmoothL1', 'RMSE'

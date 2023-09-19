@@ -59,12 +59,11 @@ class EssayDataset(Dataset):
             "token_type_ids": torch.tensor(tokenized['token_type_ids'], dtype=torch.long),
             "attention_mask": torch.tensor(tokenized['attention_mask'], dtype=torch.long)
         }
-        if self.is_test:
-            return inputs
-        else:
-            labels = self.df.loc[idx, self.classes].to_list()
+        targets = {} ## "None" value would cause error
+        if not self.is_test: ## train data have targets
+            labels = self.df.loc[idx, self.target_columns].to_list()
             targets = {"labels": torch.tensor(labels, dtype=torch.float32)}
-            return inputs, targets
+        return inputs, targets
 
 
     def __len__(self):

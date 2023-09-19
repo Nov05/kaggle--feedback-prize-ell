@@ -140,21 +140,23 @@ class FB3Model(nn.Module):
             self.pool = WeightedLayerPooling(self.config.num_hidden_layers, 
                                              layer_start = CFG.layer_start, 
                                              layer_weights = None)        
-        self.fc = nn.Linear(self.config.hidden_size, self.CFG.n_targets)
+        self.fc = nn.Linear(self.config.hidden_size, 
+                            self.CFG.n_targets)
    
 
-    def feature(self,inputs):
+    def feature(self, inputs):
         outputs = self.model(**inputs)
         if CFG.pooling != 'weightedlayer':
             last_hidden_states = outputs[0]
-            feature = self.pool(last_hidden_states,inputs['attention_mask'])
+            feature = self.pool(last_hidden_states,
+                                inputs['attention_mask'])
         else:
             all_layer_embeddings = outputs[1]
             feature = self.pool(all_layer_embeddings)
         return feature
     
 
-    def forward(self,inputs):
+    def forward(self, inputs):
         feature = self.feature(inputs)
         outout = self.fc(feature)
         return outout
