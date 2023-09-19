@@ -7,13 +7,14 @@ from transformers import AutoModel, \
 from torch_utils import MeanPooling, MaxPooling, MinPooling, \
                         AttentionPooling, WeightedLayerPooling
 from config import CustomeDebertaModelConfig, CFG, \
-                   DEBERTA_FINETUNED_CONFIG_PATH
+                   DEBERTA_FINETUNED_CONFIG_PATH, \
+                   DEBERTAV3BASE_MODEL_PATH
 
 
 
 class EssayModel(nn.Module):
     """
-        EssayModel = deberta-v3-base (frozen) + mean-pooling + 2 fully-connected layers
+        deberta-v3-base (frozen) + mean-pooling + 2 fully-connected layers
     """
     def __init__(self, 
                  config, 
@@ -47,7 +48,7 @@ class EssayModel(nn.Module):
 
 class CustomDebertaModel(nn.Module):
     """
-        EssayModel = deberta-v3-base + 1 pooling + 1 fully-connected layers
+        deberta-v3-base + 1 pooling + 1 fully-connected layers
     """
     def __init__(self, 
                  config:CFG, 
@@ -106,27 +107,27 @@ class FB3Model(nn.Module):
     def __init__(self, 
                  CFG:CFG, 
                  config_path=DEBERTA_FINETUNED_CONFIG_PATH,
-                 pretrained=False):
+                 pretrained=True):
         super().__init__()
-        self.CFG = CFG ## this causes a lot of trouble 
-        # 设置模型的config文件，根据此配置文件读取预训练模型
+
+        self.CFG = CFG 
+        
         if config_path is None:
-            self.config = AutoConfig.from_pretrained(CFG.model_path, ouput_hidden_states = True)
+            self.config = AutoConfig.from_pretrained(CFG.model_path, 
+                                                     ouput_hidden_states = True)
             self.config.hidden_dropout = 0.
             self.config.hidden_dropout_prob = 0.
             self.config.attention_dropout = 0.
-            self.config.attention_probs_dropout_prob = 0.            
-            
+            self.config.attention_probs_dropout_prob = 0.              
         else:
-            print(f"loading config from: '{config_path}'")
             self.config = torch.load(config_path)   
         
         if pretrained:
-            self.model = AutoModel.from_pretrained(CFG.model_path, config=self.config)
+            self.model = AutoModel.from_pretrained(CFG.model_path, 
+                                                   config=self.config)
         else:
             self.model = AutoModel.from_config(self.config)
-       
-            
+ 
         if CFG.pooling == 'mean':
             self.pool = MeanPooling()
         elif CFG.pooling == 'max':
@@ -136,11 +137,12 @@ class FB3Model(nn.Module):
         elif CFG.pooling == 'attention':
             self.pool = AttentionPooling(self.config.hidden_size)
         elif CFG.pooling == 'weightedlayer':
-            self.pool = WeightedLayerPooling(self.config.num_hidden_layers, layer_start = CFG.layer_start, layer_weights = None)        
-        # 用一个全连接层得到预测的6类输出
+            self.pool = WeightedLayerPooling(self.config.num_hidden_layers, 
+                                             layer_start = CFG.layer_start, 
+                                             layer_weights = None)        
         self.fc = nn.Linear(self.config.hidden_size, self.CFG.n_targets)
    
-   # 根据池化方法选择输出
+
     def feature(self,inputs):
         outputs = self.model(**inputs)
         if CFG.pooling != 'weightedlayer':
@@ -149,9 +151,9 @@ class FB3Model(nn.Module):
         else:
             all_layer_embeddings = outputs[1]
             feature = self.pool(all_layer_embeddings)
-            
         return feature
     
+
     def forward(self,inputs):
         feature = self.feature(inputs)
         outout = self.fc(feature)

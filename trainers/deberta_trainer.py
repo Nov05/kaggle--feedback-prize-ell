@@ -4,6 +4,7 @@ from transformers import AutoTokenizer
 from accelerate import Accelerator
 from tqdm import tqdm
 import gc
+import os
 
 ## local imports
 from torch_utils import EssayDataset
@@ -20,8 +21,8 @@ class DebertaTrainer(ModelTrainer):
     def __init__(self, 
                  model=None, ## fine-tuned model object
                  model_path=DEBERTA_FINETUNED_MODEL_PATH, ## path to fine-tuned model .pth
-                 config=type('EssayModelConfig', (), TRAINING_PARAMS["deberta"]), ## convert dict to obj
-                #  config=CFG, 
+                #  config=type('EssayModelConfig', (), TRAINING_PARAMS["deberta"]), ## convert dict to obj
+                 config=CFG, 
                  tokenizer=None,
                  accelerator=None,
                  target_columns=None,
@@ -37,11 +38,11 @@ class DebertaTrainer(ModelTrainer):
 						 submission_file_name=submission_file_name)
         assert config, "provide config!"
 
-        self.model_path = model_path
+        self.model_path = model_path ## fine-tuned model
         self.config = config 
         self.accelerator = accelerator if accelerator else self._get_accelerator()
         self.model = model if model else self.get_model(self.config, self.model_path, self.accelerator)
-        self.tokenizer = tokenizer if tokenizer else self.get_tokenizer(self.config.model) ## deberta-v3-base
+        self.tokenizer = tokenizer if tokenizer else self.get_tokenizer(config.model_path) ## deberta-v3-base
         self.input_keys = ['input_ids', 'token_type_ids', 'attention_mask']
         self.is_test = is_test
 
@@ -61,12 +62,13 @@ class DebertaTrainer(ModelTrainer):
 
     @staticmethod
     def get_model(config, model_path, accelerator):
-        print(f"loading model from: '{model_path}'")
-        model = EssayModel(config)
+        # model = EssayModel(config)
         # model = CustomDebertaModel(config)
-        # model = FB3Model(config)
-        model.load_state_dict(torch.load(model_path
-                                        ,map_location=accelerator.device))
+        model = FB3Model(config)
+        model_checkpoint = torch.load(model_path,
+                                      map_location=accelerator.device)
+        print(f"loading model state dict from: '{model_path}'")
+        model.load_state_dict(model_checkpoint['model'], strict=False)
         return model
 
 

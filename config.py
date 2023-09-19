@@ -33,7 +33,8 @@ SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
 DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
-DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
+# DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
+DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "_fold0_best.pth")
 DEBERTA_FINETUNED_CONFIG_PATH = os.path.join(DATASETS_DIR, "models", "config.pth")
 
 """
@@ -253,7 +254,6 @@ class CustomeDebertaModelConfig:
 
 class CFG:
 	model_name = "microsoft/deberta-v3-base"
-	# model_path = "../input/microsoftdebertav3large/deberta-v3-base"
 	model_path = DEBERTAV3BASE_MODEL_PATH
 
 	batch_size ,n_targets,num_workers = 8,6,4
