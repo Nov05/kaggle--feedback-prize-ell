@@ -20,8 +20,8 @@ class DebertaTrainer(ModelTrainer):
     def __init__(self, 
                  model=None, ## fine-tuned model object
                  model_path=DEBERTA_FINETUNED_MODEL_PATH, ## path to fine-tuned model .pth
-                #  config=TRAINING_PARAMS["deberta"], ## training config dict
-                 config=type('config', (), TRAINING_PARAMS["deberta"]), ## CFG
+                 config=type('EssayModelConfig', (), TRAINING_PARAMS["deberta"]), ## convert dict to obj
+                #  config=CFG, 
                  tokenizer=None,
                  accelerator=None,
                  target_columns=None,

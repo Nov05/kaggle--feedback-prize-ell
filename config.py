@@ -33,7 +33,7 @@ SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
 DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
-DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "00_40epochs.pth")
+DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
 DEBERTA_FINETUNED_CONFIG_PATH = os.path.join(DATASETS_DIR, "models", "config.pth")
 
 """
