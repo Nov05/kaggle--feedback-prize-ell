@@ -8,9 +8,11 @@ import gc
 ## local imports
 from torch_utils import EssayDataset
 from trainers.base_trainers import ModelTrainer
-from config import TRAINING_PARAMS, \
-                   DEBERTA_FINETUNED_MODEL_PATH
-from deberta_models import EssayModel
+from config import DEBERTA_FINETUNED_MODEL_PATH, \
+                   TRAINING_PARAMS, \
+                   CustomeDebertaModelConfig, CFG
+from deberta_models import EssayModel, \
+                           CustomDebertaModel, FB3Model
 
 
 
@@ -18,7 +20,8 @@ class DebertaTrainer(ModelTrainer):
     def __init__(self, 
                  model=None, ## fine-tuned model object
                  model_path=DEBERTA_FINETUNED_MODEL_PATH, ## path to fine-tuned model .pth
-                 config=TRAINING_PARAMS["deberta"], ## training config dict
+                #  config=TRAINING_PARAMS["deberta"], ## training config dict
+                 config=type('config', (), TRAINING_PARAMS["deberta"]), ## CFG
                  tokenizer=None,
                  accelerator=None,
                  target_columns=None,
@@ -32,11 +35,13 @@ class DebertaTrainer(ModelTrainer):
 						 train_file_name=train_file_name,
 						 test_file_name=test_file_name,
 						 submission_file_name=submission_file_name)
+        assert config, "provide config!"
+
         self.model_path = model_path
         self.config = config 
         self.accelerator = accelerator if accelerator else self._get_accelerator()
         self.model = model if model else self.get_model(self.config, self.model_path, self.accelerator)
-        self.tokenizer = tokenizer if tokenizer else self.get_tokenizer(self.config['model']) ## deberta-v3-base
+        self.tokenizer = tokenizer if tokenizer else self.get_tokenizer(self.config.model) ## deberta-v3-base
         self.input_keys = ['input_ids', 'token_type_ids', 'attention_mask']
         self.is_test = is_test
 
@@ -58,7 +63,10 @@ class DebertaTrainer(ModelTrainer):
     def get_model(config, model_path, accelerator):
         print(f"loading model from: '{model_path}'")
         model = EssayModel(config)
-        model.load_state_dict(torch.load(model_path, map_location=accelerator.device))
+        # model = CustomDebertaModel(config)
+        # model = FB3Model(config)
+        model.load_state_dict(torch.load(model_path
+                                        ,map_location=accelerator.device))
         return model
 
 
@@ -87,7 +95,7 @@ class DebertaTrainer(ModelTrainer):
 
     def _get_data_loader(self, dataset):
         data_loader = torch.utils.data.DataLoader(dataset,
-                                                  batch_size=self.config['batch_size'],
+                                                  batch_size=self.config.batch_size,
                                                   shuffle=True,
                                                   num_workers=2,
                                                   pin_memory=True)
@@ -95,7 +103,7 @@ class DebertaTrainer(ModelTrainer):
 
 
     def _get_accelerator(self):
-        accelerator = Accelerator(gradient_accumulation_steps=self.config['gradient_accumulation_steps'])
+        accelerator = Accelerator(gradient_accumulation_steps=self.config.gradient_accumulation_steps)
         return accelerator
     
 
@@ -105,11 +113,11 @@ class DebertaTrainer(ModelTrainer):
             {'params': [p for n,p in self.model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
             {'params': [p for n,p in self.model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
         ]
-        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.config['lr'], eps=self.config['adam_eps'])
+        optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=self.config.lr, eps=self.config.adam_eps)
         return optimizer
     
 
-    def accelerator_prepare(self):
+    def _accelerator_prepare(self):
         self. model, self.optim, self.train_loader, self.val_loader, self.scheduler \
             = self.accelerator.prepare(self.model,
                                        self.optim,
@@ -160,7 +168,7 @@ class DebertaTrainer(ModelTrainer):
 
 
     def train(self):
-        self.accelerator_prepare()
+        self._accelerator_prepare()
         train_progress = tqdm(range(1, self.config['epochs']+1),
                               leave=True,
                               desc="training...")
@@ -169,7 +177,7 @@ class DebertaTrainer(ModelTrainer):
             self.train_one_epoch(epoch)
             train_progress.set_description(f"EPOCH {epoch} / {self.config['epochs']} | validating...")
             self.eval_one_epoch(epoch)
-            print(f"{'='*10} EPOCH {epoch} / {self.config['epochs']} {'='*10}")
+            print(f"{'='*10} EPOCH {epoch} / {self.config.num_epochs} {'='*10}")
             print(f"train loss: {self.train_losses[-1]}")
             print(f"val loss: {self.val_losses[-1]}\n\n")
 
@@ -188,7 +196,8 @@ class DebertaTrainer(ModelTrainer):
         test_progress = tqdm(test_loader, total=len(test_loader), desc="testing...")
         preds = []
         for (inputs) in test_progress:
-            outputs = self.model(inputs)
+            with torch.no_grad():
+                outputs = self.model(inputs)
             preds.append(outputs.detach().cpu())
         preds = torch.concat(preds).numpy()
         self.clear()

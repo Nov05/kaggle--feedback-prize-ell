@@ -33,7 +33,7 @@ SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
 DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
-DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
+DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "00_40epochs.pth")
 DEBERTA_FINETUNED_CONFIG_PATH = os.path.join(DATASETS_DIR, "models", "config.pth")
 
 """
@@ -193,8 +193,8 @@ TRAINING_PARAMS["deberta"] = {
 }
 
 
-## config for deberta_models.FB3Model
-class FB3Config:
+
+class CustomeDebertaModelConfig:
 	## model construction
 	model_name = "microsoft/deberta-v3-base"
 	model_path = DEBERTAV3BASE_MODEL_PATH
@@ -208,7 +208,7 @@ class FB3Config:
 	freeze = True
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	batch_size, num_workers = 8, 4
-	epochs, print_freq = 5, 20 ## print every 20 steps when training    
+	num_epochs, print_freq = 5, 20 ## print every 20 steps when training    
 	save_all_models = False ## save model at end of every epoch
     
 	loss_func = 'SmoothL1' ## 'SmoothL1', 'RMSE'
@@ -249,3 +249,51 @@ class FB3Config:
 	train_file = TRAIN_FILE_PATH
 	test_file = TEST_FILE_PATH
 	submission_file = SUBMISSION_FILE_PATH
+
+
+class CFG:
+	model_name = "microsoft/deberta-v3-base"
+	# model_path = "../input/microsoftdebertav3large/deberta-v3-base"
+	model_path = DEBERTAV3BASE_MODEL_PATH
+
+	batch_size ,n_targets,num_workers = 8,6,4
+	target_cols = ['cohesion', 'syntax', 'vocabulary', 'phraseology', 'grammar', 'conventions']
+	epochs,print_freq = 5,20 # 训练时每隔20step打印一次    
+	save_all_models=False # 是否每个epoch都保存数据
+	gradient_checkpointing = True
+
+	loss_func = 'SmoothL1' # 'SmoothL1', 'RMSE'
+	pooling = 'attention' # mean, max, min, attention, weightedlayer
+	gradient_checkpointing = True
+	gradient_accumulation_steps = 1 # 是否使用梯度累积更新
+	max_grad_norm = 1000 #梯度裁剪
+	apex = True # 是否进行自动混合精度训练 
+
+	# 启用llrd
+	layerwise_lr,layerwise_lr_decay = 5e-5,0.9
+	layerwise_weight_decay = 0.01
+	layerwise_adam_epsilon = 1e-6
+	layerwise_use_bertadam = False
+
+	scheduler = 'cosine'
+	num_cycles ,num_warmup_steps= 0.5,0
+	encoder_lr,decoder_lr,min_lr  = 2e-5,2e-5 ,1e-6
+	max_len = 512
+	weight_decay = 0.01
+
+	fgm = True # 是否使用fgm对抗网络攻击
+	wandb=False
+	adv_lr,adv_eps,eps,betas = 1,0.2,1e-6,(0.9, 0.999)
+	unscale =True
+
+	device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+	seed=42
+	n_fold=4
+	trn_fold=list(range(n_fold))
+	debug=False # debug表示只使用少量样本跑代码，且n_fold=2，epoch=2
+
+	OUTPUT_DIR = f"./{model_name.replace('/', '-')}/"
+	train_file = '../input/feedback-prize-english-language-learning/train.csv'
+	test_file = '../input/feedback-prize-english-language-learning/test.csv'
+	submission_file = '../input/feedback-prize-english-language-learning/sample_submission.csv'

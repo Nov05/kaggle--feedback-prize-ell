@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	try:
 		if sys.argv[1]: model_type = sys.argv[1]
 	except:
-		model_type = 'nn'
+		model_type = 'deberta'
 	print(f"model type: {model_type}")
 	try:
 		if sys.argv[2]: recast_scores = bool(int(sys.argv[2]))
@@ -67,6 +67,7 @@ if __name__ == "__main__":
 												fastext_model_path=FASTTEXT_MODEL_PATH,
 												deberta_config=deberta_config)
 		
+	## train the model	
 	if model_type in ['nn', 'lgb', 'xbg', 'linear', 'dummy']:
 		print("loading training data...")
 		df = model_trainer.load_data() 
@@ -90,5 +91,6 @@ if __name__ == "__main__":
 		if model_type=='nn':
 			model_trainer.plot_loss_values()
 
+	## inference
 	model_trainer.test(recast_scores=recast_scores)
 	print("all done")

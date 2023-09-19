@@ -41,7 +41,7 @@ class EssayDataset(Dataset):
         self.df = df.reset_index(drop=True)
         self.feature_columns = FEATURE_COLUMNS
         self.target_columns = TARGET_COLUMNS
-        self.max_len = config['max_length']
+        self.max_len = config.max_length
         self.tokenizer = tokenizer
         self.is_test = is_test
 
