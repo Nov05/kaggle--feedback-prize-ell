@@ -103,10 +103,11 @@ class DebertaTrainer(ModelTrainer):
             return train_dataset, val_dataset
     
 
-    def _get_data_loader(self, dataset):
+    def _get_data_loader(self, dataset, is_test=False):
+        ## CAUTION: don't shuffle test data. or you will mess the test score
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   batch_size=self.config.batch_size,
-                                                  shuffle=True,
+                                                  shuffle=(not is_test), 
                                                   num_workers=2,
                                                   pin_memory=True)
         return data_loader
@@ -238,7 +239,7 @@ class DebertaTrainer(ModelTrainer):
         if not data_loader:
             print(f"loading test data from: '{self._test_file_name}'")
             test_dataset = self._get_datasets(is_test=True)
-            data_loader = self._get_data_loader(test_dataset)
+            data_loader = self._get_data_loader(test_dataset, is_test=True)
 
         self.model, data_loader = self.accelerator.prepare(self.model, data_loader)
         print(f"inference device: {self.accelerator.device}")

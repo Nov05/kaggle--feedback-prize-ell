@@ -1,3 +1,4 @@
+import os
 import sys
 import warnings
 warnings.filterwarnings("ignore")
@@ -10,6 +11,8 @@ from config import TRAINING_PARAMS, TEST_SIZE, \
 from trainers.sklearn_regressor import SklearnRegressorTrainer
 from trainers.pytorch_regressor import NNTrainer
 from trainers.deberta_trainer import DebertaTrainer
+
+os.environ['TOKENIZERS_PARALLELISM']='true'
 
 
 
@@ -95,14 +98,15 @@ if __name__ == "__main__":
 	## inference
 	model_trainer.test(recast_scores=recast_scores)
 
-	## test on train data
-	print(f"testing on train data...")
-	y_pred = model_trainer.test(data_loader=model_trainer.train_loader,
-							    recast_scores=False, 
-								write_submission_file=False)
-	y_true = model_trainer.train_dataset.df[TARGET_COLUMNS].to_numpy()
-	print(f"y_true: {type(y_true)}, {y_true.shape}")
-	print(f"y_pred: {type(y_pred)}, {y_pred.shape}")
-	print(f"train data mcrmse: {model_trainer.evaluate(y_true, y_pred)}")
+	# ## test on train data to debug high mcrmse issue, 
+	# ## which was caused by the data loader shuffling of the data
+	# print(f"testing on train data...")
+	# y_pred = model_trainer.test(data_loader=model_trainer.train_loader,
+	# 						    recast_scores=False, 
+	# 							write_submission_file=False)
+	# y_true = model_trainer.train_dataset.df[TARGET_COLUMNS].to_numpy()
+	# print(f"y_true: {type(y_true)}, {y_true.shape}")
+	# print(f"y_pred: {type(y_pred)}, {y_pred.shape}")
+	# print(f"train data mcrmse: {model_trainer.evaluate(y_true, y_pred)}")
 	
 	print("all done")
