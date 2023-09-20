@@ -31,10 +31,10 @@ SUBMISSION_FILE_PATH = os.path.join(ROOT_DIR, SUBMISSION_DIR, "submission.csv")
 
 ## kaggle input datasets dir, this repo and models as datasets will be attached to it
 DATASETS_DIR = os.path.join(ROOT_DIR, INPUT_DIR)
-DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
 FASTTEXT_MODEL_PATH = os.path.join(DATASETS_DIR, "fasttextmodel", "lid.176.ftz")
-# DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "deberta-finetuned.pth")
-DEBERTA_FINETUNED_MODEL_PATH = os.path.join(DATASETS_DIR, "models", "_fold0_best.pth")
+DEBERTAV3BASE_MODEL_PATH = os.path.join(DATASETS_DIR, "microsoftdeberta-v3-base", "deberta-v3-base")
+DEBERTA_FINETUNED_MODEL_PATH1 = os.path.join(DATASETS_DIR, "models", "00_40epochs.pth")
+DEBERTA_FINETUNED_MODEL_PATH2 = os.path.join(DATASETS_DIR, "models", "_fold0_best.pth")
 DEBERTA_FINETUNED_CONFIG_PATH = os.path.join(DATASETS_DIR, "models", "config.pth")
 
 """
@@ -181,7 +181,7 @@ TRAINING_PARAMS["nn"] = dict(
 TRAINING_PARAMS["deberta"] = {
 	'model': DEBERTAV3BASE_MODEL_PATH, ## 'microsoft/deberta-v3-base'
     'dropout': 0.5,
-    'max_length': 512,
+    'max_len': 512,
     'batch_size': 8, ## any number larger than 8 causes in CUDA OOM for unfreezed encoder on Kaggle GPU
     'epochs': 7,
     'lr': 3e-4,
@@ -199,7 +199,7 @@ class CustomeDebertaModelConfig:
 	## model construction
 	model_name = "microsoft/deberta-v3-base"
 	model_path = DEBERTAV3BASE_MODEL_PATH
-	finetuned_model_path = DEBERTA_FINETUNED_MODEL_PATH
+	finetuned_model_path = DEBERTA_FINETUNED_MODEL_PATH2
 	finetuned_config_path = DEBERTA_FINETUNED_CONFIG_PATH
 	pooling = 'attention' ## options: mean, max, min, attention, weightedlayer
 	target_columns = TARGET_COLUMNS
