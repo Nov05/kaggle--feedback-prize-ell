@@ -20,6 +20,7 @@
 | [n1v1 - baseline](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline |  
 | [n1v20 - dummy](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608471) | 260.8s - GPU T4 x2 | 0.644891 | 0.618766 | train and infer on GPU |
 | [n1v21 - linear](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608613) | 498.6s - GPU T4 x2 | 1.266085 | 1.254728 | train and infer on GPU |
+| [n1v23 - lgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143616210) | 323.2s - GPU T4 x2 | 0.458964 | 0.459379 | train and infer on GPU |
 | [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | <span style="color: green;">**0.470323**</span> | 0.466773 | train and infer on GPU |
 | [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
 | [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |

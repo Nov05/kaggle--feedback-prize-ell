@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	try:
 		if sys.argv[1]: model_type = sys.argv[1]
 	except:
-		model_type = 'deberta1'
+		model_type = 'deberta2'
 	print(f"model type: {model_type}")
 	try:
 		if sys.argv[2]: recast_scores = bool(int(sys.argv[2]))
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 												deberta_config=deberta_config)
 		
 	## train the model	
-	if model_type in ['nn', 'lgb', 'xbg', 'linear', 'dummy']:
+	if model_type in ['nn', 'lgb', 'xgb', 'linear', 'dummy']:
 		print("loading training data...")
 		df = model_trainer.load_data() 
 		df_features, y = model_trainer.get_training_set(df) #(df.iloc[:10,:]) ## y is a 6-col numpy.ndarray
