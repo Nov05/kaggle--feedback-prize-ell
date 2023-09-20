@@ -10,38 +10,53 @@
 * Exploratory Data Analysis[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb)  
 * Code in [【GitHub repo】](https://github.com/nov05/kaggle--feedback-prize-ell), or as [【Kaggle dataset】](https://www.kaggle.com/datasets/wenjingliu/kaggle--feedback-prize-ell)  
 * Prototype and fine-tune Deberta (with Accelerate and W&B)【notebook】[V1](https://github.com/Nov05/Google-Colaboratory/blob/master/20230911_deberta_v3_base_accelerate_finetuning.ipynb), [V2](https://github.com/Nov05/Google-Colaboratory/blob/master/20230915_deberta_v3_base_accelerate_finetuning.ipynb)   
+* **GitHub Actions** enable auto uploading repo to Kaggle[【how-to doc】](https://docs.google.com/document/d/1t5q14spGUW-xLo14hnDBK_gycsDRqdmO2POa0QzcbQE) [【github code】](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml)[【notebook for debugging】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb)
 
 
 * Kaggle submissions  
 
 | Notebook Version | **Run** | **Private Score** | **Public Score** | | 
 |-|-|-|-|-|  
-| [n1v1 - dummy](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline | 
-| [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | **0.470323** | 0.466773 | train and infer on GPU |
+| [n1v1 - baseline](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline |  
+| [n1v20 - dummy](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608471) | 260.8s - GPU T4 x2 | 0.644891 | 0.618766 | train and infer on GPU |
+| [n1v21 - linear](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608613) | 498.6s - GPU T4 x2 | 1.266085 | 1.254728 | train and infer on GPU |
+| [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | <span style="color: green;">**0.470323**</span> | 0.466773 | train and infer on GPU |
 | [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
-| [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | **80.9s** - GPU T4 x2 | 0.846934 | 0.836776 | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
-| [n1v13 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143052069) | 99.8s - GPU T4 x2 | 0.836189 | 0.795700 | fine-tuned custom deberta, 30 epochs, infer only |  
-| [n2v1 - deberta 2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | 0.440395 | 0.441242 | fine-tuned custom, 5 epochs, train and infer |
-| [n1v18 - deberta 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143575345) | 80.8s - GPU T4 x2 | 0.444191 | 0.443768 | fine-tuned custom, 5 epochs, infer only |
+| [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
+| [n1v19 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143585342) | 86.9s - GPU T4 x2 | 0.474335 | 0.478700 | fine-tuned custom deberta, 30 epochs, infer only |  
+| [n2v1 - deberta 2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | <span style="color: green;">**0.440395**</span> | 0.441242 | fine-tuned custom, 5 epochs, Multilabel Stratified 4-Fold, train and infer |
+| [n1v18 - deberta 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143575345) | <span style="color: green;">**80.8s**</span> - GPU T4 x2 | 0.444191 | 0.443768 | fine-tuned custom, 5 epochs, infer only |
 
 ***Note:***  
-*1. From the Notebook1-v7 execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
-*2. From v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training.*  
-*3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could *  
+*1. From the n1v7 Kaggle execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
+*2. From n1v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training.*  
+*3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could get very close to the best score.*  
+
+* Code repo structure explained  
+<img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot.jpg">
 
  <br>
 
 ## **Learning and Explorations**  
 
 * The architecture of the BERT family models and how to train them[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230814_huggingface_transformer_BERT_encoder_only.ipynb)  
-* Weights & Biases MLOPS-001[【notebooks】](https://drive.google.com/drive/folders/17y-_5hB9CUjDO7HhOSWXBhB_RFTTb4HV)  
+* Weights & Biases MLOPS-001[【notebooks】](https://drive.google.com/drive/folders/17y-_5hB9CUjDO7HhOSWXBhB_RFTTb4HV)   
+* **Scikit-lego** mega model example code[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230817_scikit_lego_meta_model_example_code.ipynb)
+* Loading HuggingFace models[【notebook】](https://colab.research.google.com/drive/1GABUCj34h3OOjsC8vZ7ScOsYeYuMr7qR)  
+* Scikit-learning CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
+
+[*... or check this Google Driver folder*](https://drive.google.com/drive/folders/1L-YlMhgc2LVWQTNyUweImgpNzIvURptD)
 
 <br>
 
 ## **Repo update log** 
 
+2023-09-19
+1. added another fine-tuned cutome deberta-v3-base model (model_type=**'deberta2'**), which consists of deberta-v3-base (layer learning rate decay) + attention pooling + single fully-connected layer, trained 7 epochs on Google Colab GPU T4
+2. bug fix: there is a large discrepancy bwtween the training score (around 0.45) and the testing score (around 0.8). went through the `deberta_trainer.py` code part by part, and finally figured out the problem was caused by the data loader. for testing data, `suffle=False` should be configured.   
+
 2023-09-11
-1. added fine-tuned deberta-v3-base model  
+1. added fine-tuned deberta-v3-base model (model_type=**'derberta1'**), which consists of deberta-v3-base (frozen) + mean pooling + 2 fully-connected layer with ReLU and dropout layers inbetween, trained on Google Colab GPU T4. 5 epochs can reach a score around 4.8. typically for transferred learning, a wide fully-connected layer is enough, and more might be suboptimal. also ReLU and dropout might reduce the performance.  
 2. train with Accelerate and Weights & Biases  
 
 2023-09-10  

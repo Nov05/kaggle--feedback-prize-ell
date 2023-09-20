@@ -51,7 +51,7 @@ if __name__ == "__main__":
 	print(f"recast scores: {recast_scores}")
 
 
-	if model_type in ['nn', 'lgb', 'xbg', 'linear', 'dummy']:
+	if model_type in ['nn', 'lgb', 'xgb', 'linear', 'dummy']:
 		## microsoft deberta v3 base model configuration
 		deberta_config = MSFTDeBertaV3Config(
 			model_name='deberta-v3-base',
