@@ -53,11 +53,12 @@ def make_features_pipeline(fastext_model_path,
 ```
 
 
-4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python mail.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
-<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">
+4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python mail.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could fast iterate the code, test out different models with different hyperparameters.  
+[![watch the video](https://img.youtube.com/vi/3YpoEKYnzUE/0.jpg)](https://www.youtube.com/watch?v=3YpoEKYnzUE)    
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">  
 
 
-5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fined-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 3o hours, and mine was all for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
+5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fine-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 30 hours, and mine was all used for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
 
 
 **E.g.**  
