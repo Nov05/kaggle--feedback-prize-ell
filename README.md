@@ -126,6 +126,7 @@ def make_features_pipeline(fastext_model_path,
 		* the Kaggle data files and sample submission files are stored in `\input\feedback-prize-english-language-learning`  
 		* the Kaggle Notebook working and output direcotry is `D:\github\kaggle--feedback-prize-ell\working`    
 		* your own or someone else's datasets (which might include repos, python library wheel files, models, etc. uploaded to Kaggle) will be linked as sub-directories (by clicking on the `add data` button) under the `input` directory  
+	* `main.yml` - GitHub Actions `upload github code to kaggle`  
 
 <img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot-min.jpg">
 
