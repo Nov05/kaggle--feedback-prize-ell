@@ -60,7 +60,7 @@ def make_features_pipeline(fastext_model_path,
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">  
 
 
-5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fine-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 30 hours, and mine was all used for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
+5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fine-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 30 hours, and mine was solely used for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
 
 
 **E.g.**  
