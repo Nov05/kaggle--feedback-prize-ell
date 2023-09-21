@@ -16,9 +16,10 @@
     * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines manually engineered features such as  
         * `unigrams count` (reflecting the english learners' vocabulary)  
         * `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
-        * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc., `tf-idf` (a widely used statistical method), etc.  
-        * and a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
-        * and the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
+        * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc.  
+		* `tf-idf` (a widely used statistical method), etc.  
+        * a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
+        * the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
     * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa-V3-Base`** model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different models can be trained, evaluated, tested, and submitted with similar APIs.
@@ -119,7 +120,7 @@ def make_features_pipeline(fastext_model_path,
 	* `sklearn_transformers.py` - generate fasttext and deberta features  
 	* `english_utils.py` - fasttext functions, text processing functions
 	* `torch_utils.py` - dataset classes, neural network pooling layer classes
-	* `pipelines.py` - all the scikit-learn pipelines (for model types: dummy, linear, xgb, lgb)  
+	* `pipelines.py` - all the scikit-learn pipelines (for model types: dummy, linear, xgb, lgb, nn)  
 	* `deberta_models.py` - custom deberta models  
 	* `trainers` folder - all the training classes  
 	* `input` and `working` folders - simulate the Kaggle folders  
