@@ -8,7 +8,7 @@
 
 ## **Project Achievements**
 
-1. [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be using fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge training datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
+1. [**Exploratory data analysis** (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be using fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge training datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
 
 2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes from small to large, scores from low to very close to the top ones 0.433+ (my best score so far is **0.440395**, would rank around 1,108 of 2,654 teams). 
 
@@ -19,7 +19,7 @@
         * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc., `tf-idf` (a widely used statistical method), etc.  
         * and a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
         * and the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
-    * 2 models utilized a fine-tuned custom pre-trained `DeBERTa-V3-Base` model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
+    * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa-V3-Base`** model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different models can be trained, evaluated, tested, and submitted with similar APIs.
 
@@ -126,7 +126,7 @@ def make_features_pipeline(fastext_model_path,
 		* the Kaggle data files and sample submission files are stored in `\input\feedback-prize-english-language-learning`  
 		* the Kaggle Notebook working and output direcotry is `D:\github\kaggle--feedback-prize-ell\working`    
 		* your own or someone else's datasets (which might include repos, python library wheel files, models, etc. uploaded to Kaggle) will be linked as sub-directories (by clicking on the `add data` button) under the `input` directory  
-		
+
 <img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot-min.jpg">
 
  <br>
