@@ -2,6 +2,8 @@
 
 **Evaluating language knowledge of ELL students from grades 8-12**  
 
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-21%2010_40_27-Feedback%20Prize%20-%20English%20Language%20Learning%20_%20Kaggle-min.jpg?raw=true">  
+
 <br>
 
 ## **Project Achievements**
