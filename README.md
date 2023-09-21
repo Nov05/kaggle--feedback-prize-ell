@@ -6,15 +6,17 @@
 
 ## **Project Achievements**
 
-1. [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge train datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
-2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes small to large, scores from low to very close to the top ones (my best score 0.440395, would rank around 1108 of 2,654 teams). 
+1. [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be using fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge training datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
+
+2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes from small to large, scores from low to very close to the top ones 0.433+ (my best score so far is **0.440395**, would rank around 1,108 of 2,654 teams). 
+
 3. Among the 7 models, 
     * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines manually engineered features such as  
         * `unigrams count` (reflecting the english learners' vocabulary)  
         * `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
         * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc., `tf-idf` (a widely used statistical method), etc.  
         * and a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
-        * and the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, `LightGBM` (lgb), and a 2-layer vanilla neural network (nn)   
+        * and the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
     * 2 models utilized a fine-tuned custom pre-trained `DeBERTa-V3-Base` model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different models can be trained, evaluated, tested, and submitted with similar APIs.
@@ -40,24 +42,35 @@ def make_features_pipeline(fastext_model_path,
 	features_pipeline = FeatureUnion(pipes)
 	return features_pipelines
 ```
-
 * The neural network trainer clasess 
 ```Python
     inheritance relationship:
     ModelTrainer 
         |--> SklearnTrainer
-                |--> NNTrainer (dummy, linear, xgb, lgb)
-                |--> SklearnRegressorTrainer (nn)
+                |--> SklearnRegressorTrainer (dummy, linear, xgb, lgb)
+                |--> NNTrainer (nn)
         |--> DebertaTrainer (deberta1, deberta2)
 ```
 
-4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
 
-5. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
+4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python mail.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">
+
+
+5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fined-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 3o hours, and mine was all for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
+
+
+**E.g.**  
+* upload wheel files as Kaggle dataset `Python`, then `add data` in the notebook, then install the library from the Kaggle directory by executing the command `$pip install sklego --no-index --find-links=file:///kaggle/input/python`.  
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2023_49_00-20230910_github%20repo%20(uploaded%20by%20github%20action)%20_%20Kaggle-min.jpg?raw=true" width=300>  
+
+
+6. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
+
 
 **P.S.** 
 * Kaggle leaderboard  
-<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2013_24_32-Feedback%20Prize%20-%20English%20Language%20Learning%20_%20Kaggle-min.jpg?raw=true" width=600>
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2013_24_32-Feedback%20Prize%20-%20English%20Language%20Learning%20_%20Kaggle-min.jpg?raw=true">
 
 <br>
 
@@ -76,11 +89,15 @@ def make_features_pipeline(fastext_model_path,
 |-|-|-|-|-|  
 | [n1v1 - baseline](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline |  
 | [n1v20 - dummy](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608471) | 260.8s - GPU T4 x2 | 0.644891 | 0.618766 | train and infer on GPU |
-| [n1v21 - linear](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608613) | 498.6s - GPU T4 x2 | 1.266085 | 1.254728 | train and infer on GPU |
-| [n1v25 - xgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143643199) | 467.2s - GPU T4 x2 | 0.467965 | 0.471593 | train and infer on GPU |
-| [n1v23 - lgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143616210) | 323.2s - GPU T4 x2 | <span style="color: green;">**0.458964**</span> | 0.459379 | train and infer on GPU |
+| [n1v21 - linear](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608613) | 498.6s - GPU T4 x2 | 1.266085 | 1.254728 | train and infer on GPU |  
+| [n1v27 - linear, no deberta embedding](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143725868) | 85.5s - GPU T4 x2 | 0.778257 | 0.769154 | train and infer |
+| [n1v25 - xgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143643199) | 467.2s - GPU T4 x2 | 0.467965 | 0.471593 | train and infer on GPU |  
+| [n1v28 - xgb, no deberta embedding](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143725952) | 107.7s - GPU T4 x2 | 0.540446 | 0.531599 | train and infer |  
+| [n1v23 - lgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143616210) | 323.2s - GPU T4 x2 | <span style="color: green;">**0.458964**</span> | 0.459379 | train and infer on GPU |  
+| [n1v26 - lgb, no deberta embedding](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143707001) | 71.9s - GPU T4 x2 | 0.540557 | 0.528224 | train and infer |
 | [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | 270.8s - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
-| [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
+| [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |  
+| [n1v29 - nn, no deberta embedding](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143730028) | 99.8s - GPU T4 x2 | 0.527629 | 0.515268 | train and infer on GPU |  
 | [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
 | [n1v19 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143585342) | 86.9s - GPU T4 x2 | 0.474335 | 0.478700 | fine-tuned custom deberta, 30 epochs, infer only |  
 | [n2v1 - deberta 2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | <span style="color: green;">**0.440395**</span> | 0.441242 | fine-tuned custom, 5 epochs, Multilabel Stratified 4-Fold, train and infer |
@@ -88,7 +105,9 @@ def make_features_pipeline(fastext_model_path,
 
 ***Note:***  
 *1. From the n1v7 Kaggle execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
-*2. From n1v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training.*  
+
+*2. From n1v12 to v13, with a few more epochs, there is a a little improvement. However, the scores are way larger than the column-mean baseline score is 0.644, which indicates some problem with the model or the training. it turned out that the shuffling of the test data caused the problem.*  
+
 *3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could get very close to the best score.*  
 
 * Code repo structure explained  
@@ -98,11 +117,12 @@ def make_features_pipeline(fastext_model_path,
 
 ## **Learning and Explorations**  
 
-* The architecture of the BERT family models and how to train them[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230814_huggingface_transformer_BERT_encoder_only.ipynb)  
+* The architecture of the BERT family models and how to train them, connect Google Colab with a local runtime on a docker image[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230814_huggingface_transformer_BERT_encoder_only.ipynb)  
 * Weights & Biases MLOPS-001[【notebooks】](https://drive.google.com/drive/folders/17y-_5hB9CUjDO7HhOSWXBhB_RFTTb4HV)   
 * **Scikit-lego** mega model example code[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230817_scikit_lego_meta_model_example_code.ipynb)
 * Loading HuggingFace models[【notebook】](https://colab.research.google.com/drive/1GABUCj34h3OOjsC8vZ7ScOsYeYuMr7qR)  
 * Scikit-learning CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
+* Imporve your Kaggle workflow with GitHub Actions[【Google Docs】](https://docs.google.com/document/d/1t5q14spGUW-xLo14hnDBK_gycsDRqdmO2POa0QzcbQE)  
 
 [*... or check this Google Driver folder*](https://drive.google.com/drive/folders/1L-YlMhgc2LVWQTNyUweImgpNzIvURptD)
 
