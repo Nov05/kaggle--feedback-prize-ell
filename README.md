@@ -13,16 +13,17 @@
 2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes from small to large, scores from low to very close to the top ones 0.433+ (my best score so far is **0.440395**, would rank around 1,108 of 2,654 teams). 
 
 3. Among the 7 models, 
-    * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines manually engineered features such as  
-        * `unigrams count` (reflecting the english learners' vocabulary)  
-        * `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
-        * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc.  
-		* `tf-idf` (a widely used statistical method), etc.  
+    * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines  
+		* manually engineered features such as  
+			* `unigrams count` (reflecting the english learners' vocabulary)  
+			* `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
+			* `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc.  
+			* `tf-idf` (a widely used statistical method), etc.  
         * a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
         * the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
-    * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa-V3-Base`** model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
+    * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa`** model, which consists of the deberta-v3-base model, a pooling layer, and one or two fully connected layers.  
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different models can be trained, evaluated, tested, and submitted with similar APIs.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different types of models can be trained, evaluated, tested, and submitted with similar APIs.
 
 **E.g.**   
 * The scikit-learn pipeline  
