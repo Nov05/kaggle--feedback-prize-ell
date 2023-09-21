@@ -37,8 +37,8 @@ if __name__ == "__main__":
 	##     2. deberta-v3-base(largely frozen) + attention pooling + 1 fully connected, finetuend: 'deberta2'
 
 
-	## $python <model_type> <recast_scores>
-	##     e.g. $python main.py deberta1 1
+	## $python <model_type> <recast_scores> <using_deberta>
+	##     e.g. $python main.py deberta1 1 0
 	try:
 		if sys.argv[1]: model_type = sys.argv[1]
 	except:
@@ -49,11 +49,18 @@ if __name__ == "__main__":
 	except:
 		recast_scores = False
 	print(f"recast scores: {recast_scores}")
+	if model_type in ['nn', 'lgb', 'xgb', 'linear']:
+		try:
+			if sys.argv[3]: using_deberta = bool(int(sys.argv[3]))
+		except:
+			using_deberta = True
+		print(f"using deberta: {using_deberta}")
 
 
 	if model_type in ['nn', 'lgb', 'xgb', 'linear', 'dummy']:
 		## microsoft deberta v3 base model configuration
 		deberta_config = MSFTDeBertaV3Config(
+			using_deberta = using_deberta,
 			model_name='deberta-v3-base',
 			model_path=DEBERTAV3BASE_MODEL_PATH,
 			# pooling="mean",          ## "mean" is the only option for this model
@@ -106,14 +113,14 @@ if __name__ == "__main__":
 		if model_type=='nn':
 			model_trainer.plot_loss_values()
 	# elif model_type in ['deberta1', 'deberta2]: 
-	# ## those are trained in google colab; .pth files are imported here
+	# ## those are trained in google colab; .pth files are imported for kaggle submission
 	#	pass
 
 	## inference
 	model_trainer.test(recast_scores=recast_scores)
 
 	# ## test deberta1 and deberta2 on train data to debug high mcrmse on test dataset issue, 
-	# ## which was caused by the data loader shuffling the data
+	# ## which was caused by the data loader shuffling the data (don't shuffle the test data)
 	# print(f"testing on train data...")
 	# y_pred = model_trainer.test(data_loader=model_trainer.train_loader,
 	# 						    recast_scores=False, 

@@ -4,6 +4,63 @@
 
 <br>
 
+## **Project Achievements**
+
+* [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge train datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
+* 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes small to large, scores from low to very close to the top ones (my best score 0.440395, would rank around 1108 of 2,654 teams). 
+* Among the 7 models, 
+    * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines manually engineered features such as  
+        * `unigrams count` (reflecting the english learners' vocabulary)  
+        * `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
+        * `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc., `tf-idf` (a widely used statistical method), etc.  
+        * and a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
+        * and the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, `LightGBM` (lgb), and a 2-layer vanilla neural network (nn)   
+    * 2 models utilized a fine-tuned custom pre-trained `DeBERTa-V3-Base` model, which consists of the DeBERTa base model, a pooling layer, and one or two fully connected layers.  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different models can be trained, evaluated, tested, and submitted with similar APIs.
+
+**E.g.**   
+* The scikit-learn pipeline  
+```Python
+def make_features_pipeline(fastext_model_path,
+	                       deberta_config:MSFTDeBertaV3Config):
+	pipes = [
+		("unigrams_count", number_of_unigrams_pipe),
+		("line_breaks_count", number_of_line_breaks_pipe),
+		("english_score", make_english_score_pipe(fastext_model_path)), 
+		("i_vs_I", i_pipe), 
+		("bad_punctuation", bad_punctuation_pipe),
+		("tf-idf", tf_idf_pipe)
+	]
+	if deberta_config.using_deberta:
+		print("using deberta embedding")
+		pipes += [("deberta_embedding", make_deberta_pipe(deberta_config))]
+	else:
+		print("not using deberta embedding")
+	features_pipeline = FeatureUnion(pipes)
+	return features_pipelines
+```
+
+* The neural network trainer clasess 
+```Python
+    inheritance relationship:
+    ModelTrainer 
+        |--> SklearnTrainer
+                |--> NNTrainer (dummy, linear, xgb, lgb)
+                |--> SklearnRegressorTrainer (nn)
+        |--> DebertaTrainer (deberta1, deberta2)
+```
+
+3. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
+
+4. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
+
+**P.S.** 
+* Kaggle leaderboard  
+<img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2013_24_32-Feedback%20Prize%20-%20English%20Language%20Learning%20_%20Kaggle-min.jpg?raw=true" width=600>
+
+<br>
+
 ## **Project Artifacts**
 
 * Project Proposal[【google docs】](https://docs.google.com/document/d/1euOWdw7vIrkO1fVCuqv4sPNscPVbE-fgF5VcMy9DsAs)
@@ -20,8 +77,9 @@
 | [n1v1 - baseline](https://www.kaggle.com/code/wenjingliu/20221012-col-means-as-baseline?scriptVersionId=107904814) | 23.0s | 0.644705 | 0.618673 | column means as baseline |  
 | [n1v20 - dummy](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608471) | 260.8s - GPU T4 x2 | 0.644891 | 0.618766 | train and infer on GPU |
 | [n1v21 - linear](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143608613) | 498.6s - GPU T4 x2 | 1.266085 | 1.254728 | train and infer on GPU |
-| [n1v23 - lgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143616210) | 323.2s - GPU T4 x2 | 0.458964 | 0.459379 | train and infer on GPU |
-| [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | **270.8s** - GPU T4 x2 | <span style="color: green;">**0.470323**</span> | 0.466773 | train and infer on GPU |
+| [n1v25 - xgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143643199) | 467.2s - GPU T4 x2 | 0.467965 | 0.471593 | train and infer on GPU |
+| [n1v23 - lgb](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143616210) | 323.2s - GPU T4 x2 | <span style="color: green;">**0.458964**</span> | 0.459379 | train and infer on GPU |
+| [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | 270.8s - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
 | [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |
 | [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
 | [n1v19 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143585342) | 86.9s - GPU T4 x2 | 0.474335 | 0.478700 | fine-tuned custom deberta, 30 epochs, infer only |  
@@ -34,7 +92,7 @@
 *3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could get very close to the best score.*  
 
 * Code repo structure explained  
-<img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot.jpg">
+<img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot-min.jpg">
 
  <br>
 
@@ -71,3 +129,12 @@
 1. forked then bug-fixed [the **github action**](https://github.com/Nov05/action-push-kaggle-dataset)   
 2. updated the kaggle python api version in the action, from 1.5.12 to **1.5.16**  
 3. the upload workflow will only be triggered if string "**upload to kaggle**" is found in the commit message (main.yml)  
+
+## **Reference**
+
+* Kaggle Notebook, [Using 🤗 Transformers for the first time | Pytorch by @BRYAN SANCHO](https://www.kaggle.com/code/bryansancho/using-transformers-for-the-first-time-pytorch)  
+* Kaggle Notebook, [DeBERTa-v3-base | 🤗️ Accelerate | Finetuning by @SHREYAS DANIEL GADDAM](https://www.kaggle.com/code/shreydan/deberta-v3-base-accelerate-finetuning/notebook)
+* Kaggle Notebook, [FB3 English Language Learning by @张HONGXU](https://www.kaggle.com/code/shufflecss/fb3-english-language-learning)  
+* Kaggle Notebook, [0.45 score with LightGBM and DeBERTa feature by @FEATURESELECTION](https://www.kaggle.com/code/josarago/0-45-score-with-lightgbm-and-deberta-feature?scriptVersionId=113244660) 
+* GitHub Actions repo, [jaimevalero/push-kaggle-dataset](https://github.com/jaimevalero/push-kaggle-dataset)  
+* https://github.com/microsoft/DeBERTa 

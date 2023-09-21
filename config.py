@@ -72,6 +72,7 @@ def get_default_device():
 ################################################
 class MSFTDeBertaV3Config:
 	def __init__(self,
+			  	 using_deberta,
 			     model_name,
 				 model_path,
 			     pooling="mean",
@@ -84,6 +85,7 @@ class MSFTDeBertaV3Config:
 		"""
 		assert pooling=="mean", "We removed all other implementations other than 'mean'."
 
+		self.using_deberta = using_deberta
 		self._model_name = model_name
 		self._model_path = model_path
 		self.pooling = pooling

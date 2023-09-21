@@ -34,16 +34,16 @@ class SklearnRegressorTrainer(SklearnTrainer):
 		self._model_type = model_type
 
 	def train(self, X, y, params=None):
-		if self._model_type == "lgb":
+		if self._model_type=="lgb":
 			print("creating LightGBM regressor...")
 			self._model = MultiOutputRegressor(lgb.LGBMRegressor(**params if params else {}))
-		elif self._model_type == "xgb":
+		elif self._model_type=="xgb":
 			print("creating XGBoost regressor...")
 			self._model = MultiOutputRegressor(xgb.XGBRegressor(**params if params else {}))
-		elif self._model_type == "linear":
+		elif self._model_type=="linear":
 			print("creating linear model...")
 			self._model = LinearRegression()
-		elif self._model_type == "dummy":
+		elif self._model_type=="dummy":
 			print("creating dummy model...")
 			self._model = DummyRegressor(strategy="mean")
 		else:

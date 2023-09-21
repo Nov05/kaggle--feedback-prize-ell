@@ -89,13 +89,18 @@ def make_deberta_pipe(deberta_config):
 ## tips: comment off some steps to debug a pipeline
 def make_features_pipeline(fastext_model_path,
 	                       deberta_config:MSFTDeBertaV3Config):
-	features_pipeline = FeatureUnion([
+	pipes = [
 		("unigrams_count", number_of_unigrams_pipe),
 		("line_breaks_count", number_of_line_breaks_pipe),
 		("english_score", make_english_score_pipe(fastext_model_path)), 
 		("i_vs_I", i_pipe), 
 		("bad_punctuation", bad_punctuation_pipe),
-		("tf-idf", tf_idf_pipe),
-		("deberta_pipe", make_deberta_pipe(deberta_config))
-	])
+		("tf-idf", tf_idf_pipe)
+	]
+	if deberta_config.using_deberta:
+		print("using deberta embedding")
+		pipes += [("deberta_embedding", make_deberta_pipe(deberta_config))]
+	else:
+		print("not using deberta embedding")
+	features_pipeline = FeatureUnion(pipes)
 	return features_pipeline
