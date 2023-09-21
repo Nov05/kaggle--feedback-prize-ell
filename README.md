@@ -114,6 +114,19 @@ def make_features_pipeline(fastext_model_path,
 *3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. there were also mixed techniques used during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could get very close to the best score.*  
 
 * Code repo structure explained  
+	* `main.py` - provides a command-line interface for a package  
+	* `config.py` - all the configurations  
+	* `sklearn_transformers.py` - generate fasttext and deberta features  
+	* `english_utils.py` - fasttext functions, text processing functions
+	* `torch_utils.py` - dataset classes, neural network pooling layer classes
+	* `pipelines.py` - all the scikit-learn pipelines (for model types: dummy, linear, xgb, lgb)  
+	* `deberta_models.py` - custom deberta models  
+	* `trainers` folder - all the training classes  
+	* `input` and `working` folders - simulate the Kaggle folders  
+		* the Kaggle data files and sample submission files are stored in `\input\feedback-prize-english-language-learning`  
+		* the Kaggle Notebook working and output direcotry is `D:\github\kaggle--feedback-prize-ell\working`    
+		* your own or someone else's datasets (which might include repos, python library wheel files, models, etc. uploaded to Kaggle) will be linked as sub-directories (by clicking on the `add data` button) under the `input` directory  
+		
 <img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot-min.jpg">
 
  <br>
