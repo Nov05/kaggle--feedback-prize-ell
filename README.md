@@ -64,7 +64,7 @@ def make_features_pipeline(fastext_model_path,
 
 
 **E.g.**  
-* upload wheel files as Kaggle dataset `Python`, then `add data` in the notebook, then install the library from the Kaggle directory by executing the command `$pip install sklego --no-index --find-links=file:///kaggle/input/python`.  
+* upload wheel files as Kaggle dataset `python`, then `add data` in the notebook, then install the library `sklego` from the Kaggle directory by executing the command `$pip install sklego --no-index --find-links=file:///kaggle/input/python`.  
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2023_49_00-20230910_github%20repo%20(uploaded%20by%20github%20action)%20_%20Kaggle-min.jpg?raw=true" width=300>  
 
 
