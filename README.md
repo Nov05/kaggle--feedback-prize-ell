@@ -6,9 +6,9 @@
 
 ## **Project Achievements**
 
-* [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge train datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
-* 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes small to large, scores from low to very close to the top ones (my best score 0.440395, would rank around 1108 of 2,654 teams). 
-* Among the 7 models, 
+1. [Exploratory data analysis (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge train datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
+2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes small to large, scores from low to very close to the top ones (my best score 0.440395, would rank around 1108 of 2,654 teams). 
+3. Among the 7 models, 
     * 5 models utilized a **scikit-learn (sklearn)** pipeline and 2 a regular neural network training class. The sklearn pipeline combines manually engineered features such as  
         * `unigrams count` (reflecting the english learners' vocabulary)  
         * `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
@@ -51,9 +51,9 @@ def make_features_pipeline(fastext_model_path,
         |--> DebertaTrainer (deberta1, deberta2)
 ```
 
-3. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
+4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. 
 
-4. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
+5. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
 
 **P.S.** 
 * Kaggle leaderboard  
@@ -137,4 +137,4 @@ def make_features_pipeline(fastext_model_path,
 * Kaggle Notebook, [FB3 English Language Learning by @张HONGXU](https://www.kaggle.com/code/shufflecss/fb3-english-language-learning)  
 * Kaggle Notebook, [0.45 score with LightGBM and DeBERTa feature by @FEATURESELECTION](https://www.kaggle.com/code/josarago/0-45-score-with-lightgbm-and-deberta-feature?scriptVersionId=113244660) 
 * GitHub Actions repo, [jaimevalero/push-kaggle-dataset](https://github.com/jaimevalero/push-kaggle-dataset)  
-* https://github.com/microsoft/DeBERTa 
+* GitHub repo, https://github.com/microsoft/DeBERTa 
