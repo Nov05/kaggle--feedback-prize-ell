@@ -55,7 +55,7 @@ def make_features_pipeline(fastext_model_path,
 ```
 
 
-4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python mail.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could fast iterate the code, test out different models with different hyperparameters.  
+4. A better workflow was established with [GitHub Actions](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python mail.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could fast iterate the code, test out different models with different hyperparameters. (The Kaggle dataset uploading public APIs [are not very user friendly](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb).)  
 [![watch the video](https://img.youtube.com/vi/3YpoEKYnzUE/0.jpg)](https://www.youtube.com/watch?v=3YpoEKYnzUE)    
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">  
 
@@ -139,12 +139,16 @@ def make_features_pipeline(fastext_model_path,
 * Loading HuggingFace models[【notebook】](https://colab.research.google.com/drive/1GABUCj34h3OOjsC8vZ7ScOsYeYuMr7qR)  
 * Scikit-learning CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
 * Imporve your Kaggle workflow with GitHub Actions[【Google Docs】](https://docs.google.com/document/d/1t5q14spGUW-xLo14hnDBK_gycsDRqdmO2POa0QzcbQE)  
+* Kaggle dataset uploading public APIs[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb)
 
 [*... or check this Google Driver folder*](https://drive.google.com/drive/folders/1L-YlMhgc2LVWQTNyUweImgpNzIvURptD)
 
 <br>
 
 ## **Repo update log** 
+
+2023-09-21
+1. project submitted to Udacity   
 
 2023-09-19
 1. added another fine-tuned cutome deberta-v3-base model (model_type=**'deberta2'**), which consists of deberta-v3-base (layer learning rate decay) + attention pooling + single fully-connected layer, trained 7 epochs on Google Colab GPU T4
@@ -162,7 +166,7 @@ def make_features_pipeline(fastext_model_path,
 5. submitted notebooks in kaggle   
 
 2023-09-07   
-1. forked then bug-fixed [the **github action**](https://github.com/Nov05/action-push-kaggle-dataset)   
+1. forked then bug-fixed [the **github action**](https://github.com/Nov05/action-push-kaggle-dataset) ([issue and pull request](https://github.com/jaimevalero/push-kaggle-dataset/issues/14))   
 2. updated the kaggle python api version in the action, from 1.5.12 to **1.5.16**  
 3. the upload workflow will only be triggered if string "**upload to kaggle**" is found in the commit message (main.yml)  
 
