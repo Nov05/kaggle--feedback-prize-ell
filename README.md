@@ -65,7 +65,7 @@ def make_features_pipeline(fastext_model_path,
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">  
 
 
-5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fine-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 30 hours, and mine was solely used for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `add data` in a Kaggle Notebook, and these "datasets" will be added to the `input` directory in different folders.   
+5. For successful Kaggle submissions, I also had to figure out how to install Python libraries, import deberta-v3-base model without the Internet (as the competition required), and load the model checkpoints which were fine-tuned and saved in Google Colab or locally on my laptop (Kaggle's GPU weekly quota is 30 hours, and mine was solely used for submissions). It turned out all these files can be uploaded to Kaggle as "datasets", then you can `Add Data` in a Kaggle Notebook, and these "datasets" will be added to the `Input` directory under different folders.   
 
 
 **E.g.**  
@@ -73,7 +73,7 @@ def make_features_pipeline(fastext_model_path,
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2023_49_00-20230910_github%20repo%20(uploaded%20by%20github%20action)%20_%20Kaggle-min.jpg?raw=true" width=300>  
 
 
-6. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes.  
+6. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes. And perhaps I could host one of the models somewhere, and use it to score my own writing... 🤞       
 
 
 **P.S.** 
