@@ -8,7 +8,7 @@
 
 ## **Project Achievements**
 
-1. [**Exploratory data analysis** (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be using fine-tuning pre-trained large language models, which have learnt human language deep patterns from huge training datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
+1. [**Exploratory data analysis** (EDA)](https://github.com/Nov05/Google-Colaboratory/blob/master/20221012_Kaggle_FB3_ELL_EDA.ipynb) was conducted to the training data, which has 3911 unique entries, not a large dataset. According to the size, some simple traditional NLP approaches, such as `Bag-of-Words`, `tf-idf`, etc., could work supprisingly well. Another popular approach would be using fine-tuning pre-trained large language models, which have learnt deep human language patterns from huge training datasets and store the patterns in their tens of millions even billions of parameters, such as `DeBERTa-V3-Base` (86M).  
 
 2. 7 different types of machine learning models were trained and submitted to Kaggle, with architectures from simple to complex, sizes from small to large, scores from low to very close to the top ones 0.433+ (my best score so far is **0.440395**, would rank around 1,108 of 2,654 teams). 
 
@@ -136,13 +136,15 @@ def make_features_pipeline(fastext_model_path,
 
 ## **Learning and Explorations**  
 
-* The architecture of the BERT family models and how to train them, connect Google Colab with a local runtime on a docker image[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230814_huggingface_transformer_BERT_encoder_only.ipynb)  
+* The architecture of the BERT family models and how to train them[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230814_huggingface_transformer_BERT_encoder_only.ipynb)  
 * Weights & Biases MLOPS-001[【notebooks】](https://drive.google.com/drive/folders/17y-_5hB9CUjDO7HhOSWXBhB_RFTTb4HV)   
 * **Scikit-lego** mega model example code[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230817_scikit_lego_meta_model_example_code.ipynb)
 * Loading HuggingFace models[【notebook】](https://colab.research.google.com/drive/1GABUCj34h3OOjsC8vZ7ScOsYeYuMr7qR)  
 * Scikit-learning CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
+* Connect Google Colab with a local runtime on a docker image[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230911_deberta_v3_base_accelerate_finetuning.ipynb)
 * Imporve your Kaggle workflow with GitHub Actions[【Google Docs】](https://docs.google.com/document/d/1t5q14spGUW-xLo14hnDBK_gycsDRqdmO2POa0QzcbQE)  
-* Kaggle dataset uploading public APIs[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb)
+* Kaggle dataset uploading public APIs[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb)  
+* Python Protocol or Abstract Basic Class[【notebook】](https://colab.research.google.com/drive/176bHrpwqf0lpmcaWDTBVl8yMcAYkdHPE)  
 
 [*... or check this Google Driver folder*](https://drive.google.com/drive/folders/1L-YlMhgc2LVWQTNyUweImgpNzIvURptD)
 
