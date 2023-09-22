@@ -49,7 +49,7 @@ def make_features_pipeline(fastext_model_path,
 	features_pipeline = FeatureUnion(pipes)
 	return features_pipelines
 ```
-* The neural network trainer clasess 
+* The trainer clasess 
 ```Python
     inheritance relationship:
     ModelTrainer 
@@ -106,10 +106,10 @@ def make_features_pipeline(fastext_model_path,
 | [n1v6 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142544542) | 270.8s - GPU T4 x2 | 0.470323 | 0.466773 | train and infer on GPU |
 | [n1v7 - nn](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action/?scriptVersionId=142545233) | 7098.2s | 0.470926 | 0.465280 | train and infer on CPU |  
 | [n1v29 - nn, no deberta embedding](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143730028) | 99.8s - GPU T4 x2 | 0.527629 | 0.515268 | train and infer on GPU |  
-| [n1v12 - deberta 1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
-| [n1v19 - deberta 1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143585342) | 86.9s - GPU T4 x2 | 0.474335 | 0.478700 | fine-tuned custom deberta, 30 epochs, infer only |  
-| [n2v1 - deberta 2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | <span style="color: green;">**0.440395**</span> | 0.441242 | fine-tuned custom, 5 epochs, Multilabel Stratified 4-Fold, train and infer |
-| [n1v18 - deberta 2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143575345) | <span style="color: green;">**80.8s**</span> - GPU T4 x2 | 0.444191 | 0.443768 | fine-tuned custom, 5 epochs, infer only |
+| [n1v12 - deberta1 (invalid)](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=142990426) | 80.9s - GPU T4 x2 | <span style="color: red;">0.846934</span> | <span style="color: red;">0.836776</span> | fine-tuned custom deberta-v3-base, 7 epochs, with Accelerate, infer only |
+| [n1v19 - deberta1](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143585342) | 86.9s - GPU T4 x2 | 0.474335 | 0.478700 | fine-tuned custom deberta, 30 epochs, infer only |  
+| [n2v1 - deberta2](https://www.kaggle.com/code/wenjingliu/fork-of-english-language-learning-157754/notebook?scriptVersionId=143479601) | 9895.7s - GPU P100 | <span style="color: green;">**0.440395**</span> | 0.441242 | fine-tuned custom, 5 epochs, Multilabel Stratified 4-Fold, train and infer |
+| [n1v18 - deberta2](https://www.kaggle.com/code/wenjingliu/20230910-github-repo-uploaded-by-github-action?scriptVersionId=143575345) | <span style="color: green;">**80.8s**</span> - GPU T4 x2 | 0.444191 | 0.443768 | fine-tuned custom, 5 epochs, infer only |
 
 ***Note:***  
 *1. From the n1v7 Kaggle execution log we know that the time to train the simple hidden layer neural network on CPU is 4816-4806=10s, simliar to that on GPU, which means almost all time was spent on training data and testing data transformation, due to the size of the Deberta model. Hence there is no need to test out training on GPU and infering on CPU, which would be as slow as the scenario of both processes on CPU.*     
@@ -130,7 +130,7 @@ def make_features_pipeline(fastext_model_path,
 	* `input` and `working` folders - simulate the Kaggle folders  
 		* the Kaggle data files and sample submission files are stored in `\input\feedback-prize-english-language-learning`  
 		* the Kaggle Notebook working and output direcotry is `\working`    
-		* your own or someone else's datasets (which might include repos, python library wheel files, models, etc. uploaded to Kaggle) will be linked as sub-directories (by clicking on the `add data` button) under the `input` directory  
+		* your own or someone else's datasets (which might include repos, python library wheel files, models, etc. uploaded to Kaggle) will be linked as sub-directories (by clicking on the `Add Data` button) under the `input` directory  
 	* `main.yml` - GitHub Actions `upload github code to kaggle`  
 
 <img src="https://raw.githubusercontent.com/Nov05/pictures/master/kaggle--feedback-prize-ell/2023-09-20%2001_38_46-Greenshot-min.jpg">
@@ -159,11 +159,11 @@ def make_features_pipeline(fastext_model_path,
 1. project submitted to Udacity   
 
 2023-09-19
-1. added another fine-tuned cutome deberta-v3-base model (model_type=**'deberta2'**), which consists of deberta-v3-base (layer learning rate decay) + attention pooling + single fully-connected layer, trained 7 epochs on Google Colab GPU T4
+1. added another fine-tuned cutome deberta-v3-base model (model_type=**'deberta2'**), which consists of deberta-v3-base (layer learning rate decay) + attention pooling + single fully-connected layer, trained 5 epochs on Google Colab GPU T4
 2. bug fix: there is a large discrepancy bwtween the training score (around 0.45) and the testing score (around 0.8). went through the `deberta_trainer.py` code part by part, and finally figured out the problem was caused by the data loader. for testing data, `suffle=False` should be configured.   
 
 2023-09-11
-1. added fine-tuned deberta-v3-base model (model_type=**'derberta1'**), which consists of deberta-v3-base (frozen) + mean pooling + 2 fully-connected layer with ReLU and dropout layers inbetween, trained on Google Colab GPU T4. 5 epochs can reach a score around 4.8. typically for transferred learning, a wide fully-connected layer is enough, and more might be suboptimal. also ReLU and dropout might reduce the performance.  
+1. added fine-tuned deberta-v3-base model (model_type=**'derberta1'**), which consists of deberta-v3-base (frozen) + mean pooling + 2 fully-connected layer with ReLU and dropout layers in-between, trained on Google Colab GPU T4. 7 epochs can reach a score around 4.8. typically for transferred learning, a wide fully-connected layer is enough, while more might be suboptimal. also ReLU and dropout might reduce the performance.  
 2. train with Accelerate and Weights & Biases  
 
 2023-09-10  
