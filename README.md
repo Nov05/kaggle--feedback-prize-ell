@@ -17,10 +17,13 @@
 		* manually engineered features such as  
 			* `unigrams count` (reflecting the english learners' vocabulary)  
 			* `line breaks count` (for that essays with lower scores tend to have too few or too many line breaks)  
-			* `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules), etc.  
+			* `I vs. i`  and `bad punctuation` (for that worse essays usually don't pay attention to the capitalization and punctuation rules)  
 			* `tf-idf` (a widely used statistical method), etc.  
         * a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
-        * the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature", and feed them into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 2-layer vanilla neural network (`nn`)   
+        * the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature"  
+
+		and feed the combinations into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 1-layer vanilla neural network (`nn`)   
+
     * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa`** model, which consists of the deberta-v3-base model, a pooling layer, and one or two fully connected layers.  
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;With such a design, different types of models can be trained, evaluated, tested, and submitted with similar APIs.
@@ -66,7 +69,7 @@ def make_features_pipeline(fastext_model_path,
 
 
 **E.g.**  
-* upload wheel files as Kaggle dataset `python`, then `add data` in the notebook, then install the library `sklego` from the Kaggle directory by executing the command `$pip install sklego --no-index --find-links=file:///kaggle/input/python`.  
+* upload wheel files as Kaggle dataset `python`, next `Add Data` in the notebook, then install the library `sklego` from the Kaggle directory by executing the command `$pip install sklego --no-index --find-links=file:///kaggle/input/python`.  
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2023_49_00-20230910_github%20repo%20(uploaded%20by%20github%20action)%20_%20Kaggle-min.jpg?raw=true" width=300>  
 
 
