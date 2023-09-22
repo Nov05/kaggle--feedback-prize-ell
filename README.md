@@ -73,7 +73,7 @@ def make_features_pipeline(fastext_model_path,
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2023_49_00-20230910_github%20repo%20(uploaded%20by%20github%20action)%20_%20Kaggle-min.jpg?raw=true" width=300>  
 
 
-6. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes. And perhaps I could host one of the models somewhere, and use it to score my own writing... 🤞       
+6. What can be improved? A lot of code refactoring can be done in the future, to make the training/evaluating/testing APIs and the training hyperparameters more unified, and the whole framework more flexible and automated. MLOps platforms such as **Weights & Biases** could be integrated, for better tracking and analysing of the training processes. And perhaps I could deploy one of the models somewhere on the Internet, and use it to score my own writing... 🤞       
 
 
 **P.S.** 
