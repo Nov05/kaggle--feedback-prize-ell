@@ -22,7 +22,7 @@
         * a feature engineered with **fastText**, such as `english score`, to measure how much likely an essay is classified as English (for that essays with lower scores were written by non-native English speakers who tend to use more non-English words), etc.  
         * the output of a state-of-the-art natural language model, in this case, the pre-trained transformer-based DeBERTa-V3-Base model, as a "feature"  
 
-		and feed the combinations into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and a 1-layer vanilla neural network (`nn`)   
+		and feed the combinations into the relatively "traditional" simple machine learning regressors, such as `linear`, `xgboost`, LightGBM (`lgb`), and an 1-layer vanilla neural network (`nn`)   
 
     * 2 models each utilized a fine-tuned custom pre-trained **`DeBERTa`** model, which consists of the deberta-v3-base model, a pooling layer, and one or two fully connected layers.  
 
