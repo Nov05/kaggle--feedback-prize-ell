@@ -143,7 +143,7 @@ def make_features_pipeline(fastext_model_path,
 * Weights & Biases MLOPS-001[【notebooks】](https://drive.google.com/drive/folders/17y-_5hB9CUjDO7HhOSWXBhB_RFTTb4HV)   
 * **Scikit-lego** mega model example code[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230817_scikit_lego_meta_model_example_code.ipynb)
 * Loading HuggingFace models[【notebook】](https://colab.research.google.com/drive/1GABUCj34h3OOjsC8vZ7ScOsYeYuMr7qR)  
-* Scikit-learning CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
+* Scikit-learn CountVectorize, csr_matrix, np.matrix.A[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230910_sklearn_CountVectorize%2C_csr_matrix%2C_np_matrix_A.ipynb)  
 * Connect Google Colab with a local runtime on a docker image[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230911_deberta_v3_base_accelerate_finetuning.ipynb)
 * Imporve your Kaggle workflow with GitHub Actions[【Google Docs】](https://docs.google.com/document/d/1t5q14spGUW-xLo14hnDBK_gycsDRqdmO2POa0QzcbQE)  
 * Kaggle dataset uploading public APIs[【notebook】](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb)  
