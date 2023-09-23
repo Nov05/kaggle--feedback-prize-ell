@@ -61,7 +61,7 @@ def make_features_pipeline(fastext_model_path,
 
 
 4. A better workflow was established with [**GitHub Actions**](https://github.com/Nov05/kaggle--feedback-prize-ell/blob/main/.github/workflows/main.yml), which enables code firstly to be written in a local IDE, then committed to GitHub and automatically uploaded to Kaggle as a "dataset" (if the commit message title contains the string "**upload to kaggle**"), and finally imported to a Kaggle Notebook and executed. In the Kaggle Notebook, I just needed to type `$python main.py <model_type> <recast_scores> <using_deberta>` to choose different models to run. With the workflow, I could quickly iterate the code, test out different models with different hyperparameters. (The Kaggle dataset uploading public APIs [are not very user friendly](https://github.com/Nov05/Google-Colaboratory/blob/master/20230906_github_workflow_upload_dataset_to_kaggle_debug.ipynb).)  
-[<img src="https://github.com/Nov05/pictures/blob/master/icons/black%20youtube%20icon.png?raw=true" width=100>](https://www.youtube.com/watch?v=3YpoEKYnzUE) <- Watch the video!    
+[<img src="https://github.com/Nov05/pictures/blob/master/icons/black%20youtube%20icon.png?raw=true" width=100>](https://www.youtube.com/watch?v=3YpoEKYnzUE) <- Watch the video!   
 <img src="https://github.com/Nov05/pictures/blob/master/kaggle--feedback-prize-ell/2023-09-20%2022_48_56-README.md%20-%20kaggle--feedback-prize-ell%20-%20Visual%20Studio%20Code-min.jpg?raw=true">  
 
 
@@ -116,10 +116,10 @@ def make_features_pipeline(fastext_model_path,
 
 *2. From n1v12 to v13, with a few more epochs, there is a little improvement. However, the scores 0.88+ are way larger than the column-mean baseline score 0.644, which indicates some problem with the model or the training. It turned out that the shuffling of the test data caused the problem.*  
 
-*3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. Mixed techniques are adopted during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, could get very close to the best score.*  
+*3. Submission n2v1 and n1v18 used a different cutome model, which has one `attention` pooling layer and only one fully connected layer. Mixed techniques were adopted during the traing, such as `gradient accumulation`, `layerwise learning rate decay`, `Automatic Mixed Precision`, `Multilabel Stratified K-Fold`, `Fast Gradient Method`, etc.. These techniques largely imporved the final score. With a pre-trained model, train only 5 epochs, less than 10,000 seconds, we could get very close to the best score.*  
 
 * Code repo structure explained  
-	* `main.py` - provides a command-line interface for a package  
+	* `main.py` - entry point, provides a command-line interface for a package  
 	* `config.py` - all the configurations  
 	* `sklearn_transformers.py` - generate fasttext and deberta features  
 	* `english_utils.py` - fasttext functions, text processing functions
